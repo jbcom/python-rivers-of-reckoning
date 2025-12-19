@@ -8,11 +8,10 @@ natural terrain, biomes, weather, and day/night cycles.
 """
 
 import random
-import asyncio
 from .player import Player
 from .enemy import Enemy
 from .map_data import MAP_SIZE, EVENT_TYPES
-from .engine import Engine
+from .engine import Engine, LOGICAL_WIDTH, LOGICAL_HEIGHT
 from .systems import create_game_world
 from .world_gen import BIOME_CONFIGS, BiomeType
 
@@ -25,16 +24,19 @@ class Game:
 
     All terrain, enemies, weather, and events are procedurally generated
     using noise functions and ECS architecture inspired by Otterfall.
+
+    The game uses responsive auto-scaling via pygame.SCALED for
+    seamless web deployment through pygbag.
     """
 
     def __init__(self, test_mode=False):
-        # Engine configuration
-        self.WINDOW_WIDTH = 256  # Logical width
-        self.WINDOW_HEIGHT = 256
+        # Use logical dimensions from engine
+        self.WINDOW_WIDTH = LOGICAL_WIDTH
+        self.WINDOW_HEIGHT = LOGICAL_HEIGHT
 
-        # Initialize Engine
+        # Initialize responsive Engine (auto-scales to any screen)
         if not test_mode:
-            self.engine = Engine(960, 960, "Rivers of Reckoning")
+            self.engine = Engine()
         else:
             self.engine = None
 
@@ -422,7 +424,3 @@ class Game:
             self.colors["ui"],
         )
 
-    def run(self):
-        """Run the game loop"""
-        if self.engine:
-            asyncio.run(self.engine.run(self.update, self.draw))
