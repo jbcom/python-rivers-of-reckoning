@@ -1,7 +1,7 @@
 import pytest
 from first_python_rpg.player import Player
 from first_python_rpg.enemy import Enemy
-from first_python_rpg.map import MapPyxel as Map
+from first_python_rpg.map import Map
 from first_python_rpg.map_data import MAP_SIZE, DIFFICULTY_LEVELS, ENEMY_TYPES
 
 

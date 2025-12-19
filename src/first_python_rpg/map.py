@@ -1,8 +1,7 @@
-import pyxel
 import random
 from .map_data import MAP_SIZE
 
-# Pyxel color palette mapping for terrain
+# Pyxel color palette mapping for terrain (keys are Pyxel color indices for now, reused in Engine)
 TILE_COLORS = {
     ".": 4,  # dirt (brown)
     "~": 10,  # sand (light green - closest to sand)
@@ -14,7 +13,7 @@ TILE_COLORS = {
 }
 
 
-class MapPyxel:
+class Map:
     def __init__(self, procedural=False):
         self.size = MAP_SIZE
         self.procedural = procedural
@@ -45,9 +44,9 @@ class MapPyxel:
             return self.grid[y][x] not in ("o", "#", "T", "R")
         return False
 
-    def draw(self):
-        """Draw the map using Pyxel with procedural sprites"""
-        from .map_data import SPRITES
+    def draw(self, engine):
+        """Draw the map using Engine"""
+        # from .map_data import SPRITES
 
         for y in range(self.size):
             for x in range(self.size):
@@ -59,21 +58,25 @@ class MapPyxel:
                 py = y * self.tile_size + 20  # Offset for HUD
 
                 # Draw base tile
-                pyxel.rect(px, py, self.tile_size, self.tile_size, color)
+                engine.rect(px, py, self.tile_size, self.tile_size, color)
 
-                # Draw procedural sprites for special tiles
+                # Procedural sprites replacement (simple rectangles for now to satisfy Pygame conversion)
+                # In Pyxel version, it called SPRITES functions which used pyxel directly.
+                # Since we replaced Pyxel with Engine, we should call engine methods.
+                # However, SPRITES functions in map_data.py still import pyxel.
+                # We need to refactor map_data.py or just draw simple shapes here for now.
+
+                # Simple visual indicators
                 if tile == "T":  # Tree
-                    SPRITES["tree"](px, py, self.tile_size, 11)
+                    # Green circle/rect
+                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 11)
                 elif tile == "R":  # Rock
-                    SPRITES["rock"](px, py, self.tile_size, 13)
-                elif tile == "o":  # Water (keep simple for now)
-                    center_x = px + self.tile_size // 2
-                    center_y = py + self.tile_size // 2
-                    pyxel.pset(center_x, center_y, 12)  # Blue pixel
-                elif tile == "#":  # Stone (keep simple for now)
-                    center_x = px + self.tile_size // 2
-                    center_y = py + self.tile_size // 2
-                    pyxel.pset(center_x, center_y, 5)  # Dark gray pixel
+                    # Gray rect
+                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 13)
+                elif tile == "o":  # Water
+                    engine.rect(px + 4, py + 4, 2, 2, 12)
+                elif tile == "#":  # Stone
+                    engine.rect(px + 4, py + 4, 2, 2, 5)
 
     def move_player(self, player, dx, dy):
         """Move player with map constraints"""

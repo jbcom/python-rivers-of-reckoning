@@ -7,7 +7,7 @@ from .game import Game
 
 def main():
     """Main CLI entry point"""
-    print("Starting First Python RPG...")
+    print("Starting First Python RPG (Pygame-ce Edition)...")
 
     try:
         game = Game()
@@ -16,7 +16,8 @@ def main():
         print("\nGame interrupted by user")
         sys.exit(0)
     except Exception as e:
-        print(f"Error: {e}")
+        # print(f"Error: {e}")
+        raise e
         sys.exit(1)
 
 
