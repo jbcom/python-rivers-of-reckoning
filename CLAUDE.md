@@ -1,78 +1,95 @@
-# CLAUDE.md
+# CLAUDE.md - Rivers of Reckoning
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **A fully procedural roguelike RPG designed for web-first gameplay via pygbag**
 
-> **See also:** `AGENTS.md` for comprehensive agent instructions.
+## 🎮 Game Mission
 
-## Quick Start
+Rivers of Reckoning is a **web-first, procedurally generated RPG** built with pygame-ce and deployed via pygbag to GitHub Pages. Every aspect of the game—terrain, biomes, enemies, weather—is generated using noise functions for infinite replayability.
+
+### Core Design Principles
+
+1. **Web-First**: The game is designed primarily for browser play. All code must be pygbag-compatible.
+2. **Responsive Scaling**: Uses `pygame.SCALED | pygame.RESIZABLE` to auto-adapt to any screen size.
+3. **Procedural Everything**: No hardcoded maps or content. Everything is generated from noise and seeds.
+4. **Retro Aesthetic**: 256x256 logical resolution with a 16-color palette, scaled to fill the viewport.
+5. **ECS Architecture**: Clean separation of data (components) and logic (systems) using esper.
+
+### Technology Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Engine | pygame-ce | Cross-platform 2D graphics |
+| Web Deploy | pygbag | Python → WebAssembly compilation |
+| World Gen | opensimplex | Noise-based procedural terrain |
+| Architecture | esper | Entity Component System |
+
+## Development Commands
 
 ```bash
-# Check current context before starting
-cat memory-bank/activeContext.md 2>/dev/null || echo "No active context"
+# Run the game (works locally and compiles for web)
+python main.py
 
-# Check for project-specific instructions
-cat .github/copilot-instructions.md 2>/dev/null
+# Run tests
+pytest -v
+
+# Lint code
+flake8 src/first_python_rpg/
+
+# Build for web
+python -m pygbag --build .
+
+# Update dependencies
+uv lock && uv sync
 ```
-
-## Development Workflow
-
-### Before Making Changes
-1. Read the issue/PR description completely
-2. Check `memory-bank/` for project context
-3. Look at recent commits for coding patterns
-4. Run tests to ensure clean starting state
-
-### Making Changes
-1. Create a feature branch if not already on one
-2. Make minimal, focused changes
-3. Write/update tests for new functionality
-4. Ensure all tests pass
-5. Update documentation if needed
-
-### Committing
-```bash
-# Use conventional commits
-git commit -m "feat(scope): add new feature"
-git commit -m "fix(scope): resolve bug"
-git commit -m "docs: update README"
-git commit -m "test: add missing tests"
-git commit -m "chore: update dependencies"
-```
-
-## Code Quality Checklist
-
-Before considering work complete:
-- [ ] All tests pass
-- [ ] Linting passes
-- [ ] No new warnings introduced
-- [ ] Documentation updated if needed
-- [ ] Commit messages follow conventional format
 
 ## Project Structure
 
 ```
-.
-├── src/                 # Source code
-├── tests/               # Test files
-├── docs/                # Documentation
-├── memory-bank/         # AI context files
-│   ├── activeContext.md # Current focus
-│   └── progress.md      # Session progress
-├── .github/
-│   ├── copilot-instructions.md  # Copilot context
-│   └── workflows/       # CI/CD
-├── CLAUDE.md            # This file
-└── AGENTS.md            # Agent instructions
+main.py                    # Single entry point (pygbag-compatible async)
+src/first_python_rpg/
+├── engine.py              # Responsive pygame wrapper with auto-scaling
+├── game.py                # Main game class and state machine
+├── world_gen.py           # Procedural world generation (OpenSimplex)
+├── systems.py             # ECS components and processors
+├── map.py                 # Infinite map with camera viewport
+├── player.py              # Player entity and mechanics
+├── enemy.py               # Enemy entities
+└── map_data.py            # Game constants and data
 ```
 
-## Getting Help
+## Key Architecture Decisions
 
-1. Check `AGENTS.md` for detailed instructions
-2. Check `.github/copilot-instructions.md` for dev commands
-3. Check `docs/` for architecture decisions
-4. Look at test files for usage examples
+### Single Entry Point
+There is ONE `main.py` file. No separate desktop/web versions. The game is inherently web-first and uses async patterns compatible with pygbag.
 
-## Repository-Specific Notes
+### Responsive Engine
+The `Engine` class uses `pygame.SCALED | pygame.RESIZABLE` flags. The game renders at 256x256 logical pixels and automatically scales to fill any viewport while maintaining aspect ratio.
 
-<!-- Add repository-specific context below -->
+### Infinite Procedural World
+The `ProceduralWorld` class generates terrain on-demand using OpenSimplex noise. Each seed produces a unique but reproducible world. The camera follows the player through infinite terrain.
 
+### ECS Pattern
+Game logic is separated into:
+- **Components**: Pure data (Position, Health, Combat, etc.)
+- **Processors**: Systems that operate on components (Movement, AI, Weather)
+
+## Coding Standards
+
+- **Python 3.10+** required
+- **No blocking calls** - everything must be async-compatible for pygbag
+- **No desktop-specific code** - web-first means no file system access, no subprocess, etc.
+- **Conventional commits** - feat/fix/docs/test/chore prefixes
+
+## Before Making Changes
+
+1. Read `memory-bank/activeContext.md` if it exists
+2. Run tests: `pytest -v`
+3. Check lint: `flake8 src/`
+4. Understand the web-first constraint
+
+## After Making Changes
+
+1. Ensure all tests pass
+2. Ensure lint passes
+3. Test that the game runs: `python main.py`
+4. Update documentation if needed
