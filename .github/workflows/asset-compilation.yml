@@ -30,7 +30,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pygame-ce
-        pip install -e .
+        pip install -e python-archive/
 
     - name: Validate game modules
       run: |
