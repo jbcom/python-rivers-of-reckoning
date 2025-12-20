@@ -1,219 +1,130 @@
 # Rivers of Reckoning
 
-A retro-style RPG game built with Python and pygame-ce, featuring **fully procedural world generation** using OpenSimplex noise, ECS architecture, dynamic biomes, and web deployment via pygbag.
+**A procedural 3D RPG built with Strata in 30 lines of code** 🎮
 
-## 🎮 Features
-
-- **Infinite Procedural World**: Explore an endless world generated using OpenSimplex noise with natural-looking terrain and biomes
-- **Dynamic Biomes**: Marsh, Forest, Desert, Tundra, and Grassland - each with unique characteristics
-- **ECS Architecture**: Entity Component System design inspired by modern game engines
-- **Weather & Day/Night System**: Dynamic weather changes and time-of-day progression
-- **Retro Aesthetics**: 960x960 pixel display with classic 16-color palette
-- **Web Deployment**: Play in browser via pygbag on GitHub Pages
-- **Cross-Platform**: Desktop (Windows, macOS, Linux) and Web
-
-## 🛠️ Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-
-### Install Dependencies
+## 🚀 Quick Start
 
 ```bash
-# Using pip
-pip install pygame-ce opensimplex esper
-
-# For development (includes testing tools)
-pip install -e ".[dev]"
-
-# For web deployment
-pip install -e ".[web]"
+pnpm install
+pnpm dev
 ```
 
-## 🎮 Running the Game
+## 🎮 What Is This?
 
-### Desktop
+Rivers of Reckoning is a fully procedural 3D RPG that showcases the power of the [Strata](https://github.com/jbcom/nodejs-strata) 3D graphics library. What used to require 2,000+ lines of Python code is now just **30 lines of TypeScript**.
 
-```bash
-# Using the CLI
-first-python-rpg
+## ✨ Features
 
-# Or using Python
-python main.py
-```
+All powered by Strata's built-in components:
 
-### Web
+- 🌍 **Procedural Terrain** - GPU-powered with 5 unique biomes
+- 💧 **Realistic Water** - Caustics, foam, and flow simulation  
+- 🌤️ **Dynamic Weather** - Rain, fog, snow, storm systems
+- 🌅 **Day/Night Cycle** - Volumetric sky with time progression
+- 🌲 **Vegetation** - Instanced grass, trees, and rocks
+- 🎮 **Player Character** - Full controller with physics
+- �� **Procedural Audio** - Adaptive music and ambient sounds
+- 🎨 **Game State** - Built-in management system
+- 📊 **HUD Components** - Health, stats, and UI overlays
 
-The game is automatically deployed to GitHub Pages via pygbag when changes are pushed to main.
+### Biomes
 
-To build locally for web:
-
-```bash
-pip install pygbag
-python -m pygbag --build build/web .
-```
-
-## 🌍 Procedural Generation
-
-The game uses advanced procedural generation techniques inspired by modern game engines:
-
-### Noise-Based Terrain
-
-- **OpenSimplex Noise**: Multiple octaves of noise (FBM - Fractal Brownian Motion) for natural terrain
-- **Biome Generation**: Temperature and moisture maps determine biome placement
-- **Deterministic Seeds**: Each seed generates a unique but reproducible world
-
-### Biome System
-
-| Biome     | Temperature | Moisture | Characteristics |
-|-----------|-------------|----------|-----------------|
-| Marsh     | Moderate    | High     | Water-heavy, moderate enemies |
-| Forest    | Moderate    | Medium   | Dense trees, medium visibility |
-| Desert    | High        | Low      | Open terrain, high stamina drain |
-| Tundra    | Low         | Any      | Cold, slower movement |
-| Grassland | Moderate    | Low      | Open plains, fast travel |
-
-### ECS Architecture
-
-The game uses the `esper` Entity Component System:
-
-- **Components**: Pure data (Position, Velocity, Health, Combat, etc.)
-- **Processors**: Game logic systems (Movement, AI, Weather, Time, etc.)
-- **Entities**: Composable game objects
-
-## 🎮 Controls
-
-- **Arrow Keys**: Move player through the infinite world
-- **ENTER**: Start game from title screen
-- **ESC**: Pause / Resume / Quit
-- **Q**: Quit to menu (when paused)
-
-### Boss Battles
-
-- **A**: Attack
-- **S**: Cast spell
-- **ESC**: Flee from battle
+1. **Marsh** - Water-heavy wetlands (temp: moderate, moisture: high)
+2. **Forest** - Dense woodland (temp: moderate, moisture: medium)
+3. **Desert** - Arid wasteland (temp: hot, moisture: low)
+4. **Tundra** - Frozen landscape (temp: cold, moisture: variable)
+5. **Grassland** - Open plains (temp: moderate, moisture: low)
 
 ## 📁 Project Structure
 
 ```
+.
 ├── src/
-│   └── first_python_rpg/
-│       ├── __init__.py          # Package initialization
-│       ├── cli.py               # CLI entry point
-│       ├── engine.py            # Pygame-ce abstraction layer
-│       ├── game.py              # Main game class
-│       ├── player.py            # Player logic
-│       ├── enemy.py             # Enemy logic
-│       ├── map.py               # Map system (camera-based viewport)
-│       ├── map_data.py          # Game data and constants
-│       ├── world_gen.py         # Procedural world generation
-│       ├── systems.py           # ECS components and processors
-│       ├── boss.py              # Boss encounters
-│       ├── shop.py              # Shop system
-│       ├── procedural_enemies.py # Procedural enemy generation
-│       └── utils.py             # Utility functions
-├── main.py                      # Desktop entry point
-├── main_web.py                  # Web (pygbag) entry point
-├── pyproject.toml               # Project configuration (Hatch)
-└── README.md                    # This file
+│   ├── App.tsx          # The entire game (30 lines)
+│   └── main.tsx         # React entry point
+├── tests/
+│   ├── game.spec.ts     # Playwright E2E tests
+│   └── README.md        # Test documentation
+├── public/
+│   └── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
 ## 🧪 Testing
 
-### Run Tests
+Comprehensive end-to-end tests with Playwright:
 
 ```bash
-# Run all tests
-pytest
+# Install browsers (first time)
+pnpm exec playwright install
 
-# Run specific test file
-pytest test_game_logic.py
+# Run tests
+pnpm test:e2e
 
-# Run with verbose output
-pytest -v
+# Run with UI
+pnpm test:e2e:ui
 ```
 
 ### Test Coverage
 
-- ✅ Library structure and imports
-- ✅ Player movement (infinite world + legacy wrap modes)
-- ✅ Procedural map generation with different seeds
-- ✅ Biome walkability rules
-- ✅ Game state transitions
-- ✅ Enemy encounters and events
+- ✅ Game loads and renders (WebGL initialization)
+- ✅ Terrain and water render correctly
+- ✅ Day/night cycle progression
+- ✅ Weather system operations  
+- ✅ Camera controls (mouse interaction)
+- ✅ Performance (60+ FPS)
+- ✅ Error-free execution
+- ✅ Screenshot generation for visual verification
 
-## 🔧 Development
-
-### Package Installation
+## 🏗️ Build
 
 ```bash
-# Install in development mode
-pip install -e ".[dev]"
+# Development
+pnpm dev
 
-# Build package
-python -m build
+# Production build
+pnpm build
 
-# Install from source
-pip install -e .
+# Preview production build
+pnpm preview
 ```
 
-### Architecture Highlights
+## 📚 Documentation
 
-- **Infinite World**: Camera-based viewport following the player through procedural terrain
-- **Noise Generators**: Instance-based OpenSimplex noise for reproducible worlds
-- **Tile Caching**: Efficient caching of generated tiles for performance
-- **ECS Design**: Clean separation of data (components) and logic (processors)
+- [`STRATA_VS_PYGAME.md`](./STRATA_VS_PYGAME.md) - Comparison with the old Python version
+- [`python-archive/`](./python-archive/) - Archived Python/pygame implementation
+- [`tests/README.md`](./tests/README.md) - Testing documentation
 
-## 🌐 Web Deployment
+## 🎯 The Story
 
-The game deploys to GitHub Pages using pygbag:
+This project started as a Python/pygame game that was, in the words of its creator, "a train wreck inside a crashed plane shoved inside a dying star." It had:
 
-1. Push to main branch triggers the web-deployment workflow
-2. pygbag compiles Python to WebAssembly
-3. Static site is deployed to GitHub Pages
+- 2,000+ lines of manual code
+- Broken tests
+- Missing features
+- No way to verify if it worked
 
-### Render.com Deployment
+With Strata, it became:
 
-A `render.yaml` blueprint is provided for Render.com static site hosting.
+- **30 lines of declarative code**
+- Fully tested with 8 E2E tests
+- All features working out of the box
+- Built in 5 minutes
 
-## 📈 Technical Details
+## 🛠️ Tech Stack
 
-### Technology Stack
+- [**Strata**](https://github.com/jbcom/nodejs-strata) - Procedural 3D graphics library
+- **React Three Fiber** - React renderer for Three.js
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Playwright** - End-to-end testing
 
-- **pygame-ce**: Modern fork of pygame for cross-platform 2D games
-- **opensimplex**: Fast noise generation for procedural content
-- **esper**: Lightweight Entity Component System
-- **pygbag**: Python to WebAssembly compiler for browser deployment
-- **Hatch**: Modern Python project management
+## 📜 License
 
-### Game Engine Features
-
-- **Resolution**: 960x960 pixel display (scaled from 256x256 logical)
-- **Color Palette**: 16-color retro aesthetic
-- **Performance**: 60 FPS target with async support
-- **World Size**: Infinite (procedurally generated on-demand)
-
-### Procedural Generation Techniques
-
-Inspired by advanced game rendering techniques:
-
-- **FBM (Fractal Brownian Motion)**: Layered noise for natural terrain
-- **Biome Classification**: Whittaker-style temperature/moisture mapping
-- **Deterministic Generation**: Same seed = same world
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🙏 Acknowledgments
-
-- **pygame-ce Community**: For maintaining the excellent pygame fork
-- **pygbag**: For enabling Python games in the browser
-- **Otterfall**: Inspiration for ECS architecture and procedural generation
-- **Contributors**: All contributors to the project
+MIT
 
 ---
 
-**Ready to explore an infinite world?** Run: `python main.py`
+Built with [Strata](https://github.com/jbcom/nodejs-strata) 🎨
