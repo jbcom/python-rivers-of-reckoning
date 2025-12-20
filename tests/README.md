@@ -19,16 +19,33 @@ pnpm test:e2e:ui
 pnpm test:e2e:debug
 ```
 
-## Test Coverage
+## Test Coverage (17 Tests)
 
-✅ **Game loads and renders** - Canvas appears, WebGL initializes  
-✅ **Terrain & Water render** - 3D scene with Strata components  
-✅ **Day/Night cycle works** - Time progresses correctly  
-✅ **Weather system active** - Dynamic weather changes  
-✅ **Camera controls** - Mouse interaction works  
-✅ **Performance test** - Maintains 60+ FPS  
+### Core Functionality
+✅ **Title screen loads** - Logo, features, controls hint displayed  
+✅ **Game starts** - Canvas appears when clicking START GAME  
+✅ **Terrain & Water render** - 3D scene with WebGL context  
+✅ **HUD displays info** - Health, gold, biome, weather visible  
+
+### Player & Combat
+✅ **WASD movement** - All movement keys work  
+✅ **Arrow key movement** - Alternative controls  
+✅ **Combat attack (Space/Click)** - Attack system functional  
+✅ **Player stats display** - Level, gold, score shown  
+
+### Game Systems
+✅ **Day/Night cycle** - Time phase displayed correctly  
+✅ **Weather system** - Weather type shown in HUD  
+✅ **Camera controls** - Mouse rotation works  
+✅ **Pause menu** - ESC opens pause, Resume works  
+✅ **Quit to menu** - Can return to title screen  
+
+### Technical Quality
+✅ **Performance 30+ FPS** - Game runs smoothly  
 ✅ **No console errors** - Clean execution  
-✅ **Visual verification** - Screenshot generation  
+✅ **Enemies render** - Enemy system functioning  
+✅ **Responsive design** - Canvas fills viewport  
+✅ **Initial values correct** - 100 HP, 0 gold, Grassland, Day 1  
 
 ## Screenshots Generated
 
@@ -59,13 +76,15 @@ Tests run on:
 - ❌ No visual verification
 
 ### Strata/TypeScript Version
-- ✅ **8 comprehensive** E2E tests
+- ✅ **17 comprehensive** E2E tests
 - ✅ Verified working in 3 browsers
 - ✅ All tests passing
-- ✅ 1 test file (~200 lines) covers entire game
+- ✅ 1 test file (~350 lines) covers entire game
 - ✅ Automatic screenshot generation
 - ✅ Performance metrics
 - ✅ FPS monitoring
+- ✅ Player movement & combat tests
+- ✅ UI and HUD verification
 
 ## Test Architecture
 

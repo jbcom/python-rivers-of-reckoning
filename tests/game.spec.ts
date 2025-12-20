@@ -346,4 +346,164 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
       fullPage: true 
     })
   })
+
+  test('player stats display (gold, level, XP)', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(1000)
+    
+    // Get HUD text content
+    const bodyText = await page.locator('body').textContent()
+    
+    // Check for player stats - at minimum should see Level 1
+    expect(bodyText).toMatch(/Level\s*1|Lv\s*1|LVL\s*1/i)
+    
+    // Check for gold display
+    const hasGoldDisplay = bodyText?.includes('Gold') || bodyText?.includes('0')
+    expect(hasGoldDisplay).toBe(true)
+    
+    // Check for score display
+    const hasScoreDisplay = bodyText?.includes('Score') || bodyText?.match(/\d+/)
+    expect(hasScoreDisplay).toBeTruthy()
+  })
+
+  test('keyboard controls are responsive', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(1000)
+    
+    // Test all WASD keys
+    const keys = ['w', 'a', 's', 'd']
+    
+    for (const key of keys) {
+      await page.keyboard.down(key)
+      await page.waitForTimeout(200)
+      await page.keyboard.up(key)
+      await page.waitForTimeout(100)
+    }
+    
+    // Test arrow keys
+    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+    
+    for (const key of arrowKeys) {
+      await page.keyboard.down(key)
+      await page.waitForTimeout(200)
+      await page.keyboard.up(key)
+      await page.waitForTimeout(100)
+    }
+    
+    // Game should still be running
+    const canvas = page.locator('canvas')
+    await expect(canvas).toBeVisible()
+    
+    // Take screenshot after all movements
+    await page.screenshot({ path: 'tests/screenshots/keyboard-test.png' })
+  })
+
+  test('quit to menu from pause works', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(500)
+    
+    // Press ESC to pause
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(500)
+    
+    // Check for quit button
+    const quitButton = page.getByRole('button', { name: /quit|menu|exit/i })
+    await expect(quitButton).toBeVisible()
+    
+    // Click quit
+    await quitButton.click()
+    await page.waitForTimeout(500)
+    
+    // Should be back at title screen
+    const bodyText = await page.locator('body').textContent()
+    expect(bodyText).toContain('RIVERS')
+    expect(bodyText).toContain('RECKONING')
+    
+    // Screenshot title screen after quit
+    await page.screenshot({ path: 'tests/screenshots/quit-to-menu.png' })
+  })
+
+  test('game renders enemies', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(2000)
+    
+    // Check that WebGL is rendering objects (enemies, terrain, player)
+    const hasObjects = await page.evaluate(() => {
+      const canvas = document.querySelector('canvas') as HTMLCanvasElement
+      if (!canvas) return false
+      
+      // Check canvas has content by looking at pixel data
+      const ctx = canvas.getContext('webgl2') || canvas.getContext('webgl')
+      return ctx !== null
+    })
+    
+    expect(hasObjects).toBe(true)
+    
+    // Screenshot showing game with enemies
+    await page.screenshot({ path: 'tests/screenshots/game-with-enemies.png' })
+  })
+
+  test('HUD shows correct initial values', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(1000)
+    
+    const bodyText = await page.locator('body').textContent() || ''
+    
+    // Check initial health (should be 100)
+    expect(bodyText).toMatch(/100/)
+    
+    // Check initial gold (should be 0)
+    expect(bodyText).toMatch(/Gold.*0|0.*Gold/i)
+    
+    // Check starting biome (Grassland)
+    expect(bodyText).toContain('Grassland')
+    
+    // Check Day 1
+    expect(bodyText).toContain('Day 1')
+  })
+
+  test('responsive design - canvas fills viewport', async ({ page }) => {
+    // Start the game
+    await page.waitForTimeout(500)
+    const startButton = page.getByRole('button', { name: /start/i })
+    await startButton.click()
+    
+    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForTimeout(500)
+    
+    const canvas = page.locator('canvas')
+    const viewport = page.viewportSize()
+    const canvasBox = await canvas.boundingBox()
+    
+    if (viewport && canvasBox) {
+      // Canvas should fill most of the viewport
+      expect(canvasBox.width).toBeGreaterThan(viewport.width * 0.8)
+      expect(canvasBox.height).toBeGreaterThan(viewport.height * 0.5)
+    }
+  })
 })

@@ -18,6 +18,7 @@ import {
   Weather,
   WorldState,
 } from '../types/game'
+import { PLAYER, TIME, WEATHER, LEVELING } from '../constants/game'
 
 interface GameStore {
   // Game state
@@ -59,9 +60,9 @@ interface GameStore {
 }
 
 const getTimePhase = (hour: number): TimePhase => {
-  if (hour >= 5 && hour < 7) return TimePhase.DAWN
-  if (hour >= 7 && hour < 18) return TimePhase.DAY
-  if (hour >= 18 && hour < 20) return TimePhase.DUSK
+  if (hour >= TIME.DAWN_START && hour < TIME.DAWN_END) return TimePhase.DAWN
+  if (hour >= TIME.DAWN_END && hour < TIME.DAY_END) return TimePhase.DAY
+  if (hour >= TIME.DAY_END && hour < TIME.DUSK_END) return TimePhase.DUSK
   return TimePhase.NIGHT
 }
 
@@ -98,11 +99,11 @@ const getSeededRandom = (seed: number): number => {
 
 const getRandomWeather = (seed: number): WeatherType => {
   const choices: [WeatherType, number][] = [
-    [WeatherType.CLEAR, 0.5],
-    [WeatherType.RAIN, 0.2],
-    [WeatherType.FOG, 0.15],
-    [WeatherType.SNOW, 0.1],
-    [WeatherType.STORM, 0.05],
+    [WeatherType.CLEAR, WEATHER.CLEAR_WEIGHT],
+    [WeatherType.RAIN, WEATHER.RAIN_WEIGHT],
+    [WeatherType.FOG, WEATHER.FOG_WEIGHT],
+    [WeatherType.SNOW, WEATHER.SNOW_WEIGHT],
+    [WeatherType.STORM, WEATHER.STORM_WEIGHT],
   ]
 
   const total = choices.reduce((sum, [, weight]) => sum + weight, 0)
@@ -123,35 +124,45 @@ export const useGameStore = create<GameStore>()(
     gameState: 'title',
     setGameState: (state) => set({ gameState: state }),
 
-    // Player initial state
+    // Player initial state (using constants)
     playerPosition: { x: 0, y: 0, z: 0 },
-    playerHealth: { current: 100, maximum: 100, regenRate: 0.5 },
-    playerStamina: { current: 100, maximum: 100, regenRate: 10 },
+    playerHealth: { 
+      current: PLAYER.INITIAL_HEALTH, 
+      maximum: PLAYER.INITIAL_HEALTH, 
+      regenRate: PLAYER.HEALTH_REGEN_RATE 
+    },
+    playerStamina: { 
+      current: PLAYER.INITIAL_STAMINA, 
+      maximum: PLAYER.INITIAL_STAMINA, 
+      regenRate: PLAYER.STAMINA_REGEN_RATE 
+    },
     playerStats: {
-      gold: 0,
+      gold: PLAYER.INITIAL_GOLD,
       score: 0,
       level: 1,
       experience: 0,
-      expToNext: 100,
+      expToNext: LEVELING.BASE_XP_REQUIRED,
       mana: 50,
       maxMana: 50,
     },
 
-    movePlayer: (dx, dy, dz) =>
-      set((state) => {
-        const newPos = {
+    movePlayer: (dx, dy, dz) => {
+      // Performance optimization: Skip tiny movements to reduce state updates
+      const distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
+      if (distance < 0.01) return // Threshold for minimum movement
+      
+      set((state) => ({
+        playerPosition: {
           x: state.playerPosition.x + dx,
           y: state.playerPosition.y + dy,
           z: state.playerPosition.z + dz,
-        }
-        return {
-          playerPosition: newPos,
-          worldState: {
-            ...state.worldState,
-            distanceTraveled: state.worldState.distanceTraveled + Math.sqrt(dx * dx + dy * dy + dz * dz),
-          },
-        }
-      }),
+        },
+        worldState: {
+          ...state.worldState,
+          distanceTraveled: state.worldState.distanceTraveled + distance,
+        },
+      }))
+    },
 
     damagePlayer: (amount) =>
       set((state) => {
@@ -190,10 +201,11 @@ export const useGameStore = create<GameStore>()(
         let level = state.playerStats.level
         let expToNext = state.playerStats.expToNext
 
-        while (exp >= expToNext) {
+        // Level up loop with soft cap
+        while (exp >= expToNext && level < LEVELING.MAX_LEVEL) {
           exp -= expToNext
           level += 1
-          expToNext = Math.floor(expToNext * 1.5)
+          expToNext = Math.floor(expToNext * LEVELING.XP_MULTIPLIER)
         }
 
         return {
@@ -205,16 +217,16 @@ export const useGameStore = create<GameStore>()(
           },
           playerHealth: {
             ...state.playerHealth,
-            maximum: 100 + (level - 1) * 10,
+            maximum: PLAYER.INITIAL_HEALTH + (level - 1) * PLAYER.HEALTH_PER_LEVEL,
           },
         }
       }),
 
-    // Time system
+    // Time system (using constants)
     timeOfDay: {
-      hour: 8.0,
+      hour: TIME.STARTING_HOUR,
       phase: TimePhase.DAY,
-      timeScale: 60.0,
+      timeScale: TIME.TIME_SCALE,
       dayCount: 1,
     },
 
@@ -256,12 +268,17 @@ export const useGameStore = create<GameStore>()(
           return {}
         }
 
+        // Use seeded random for deterministic wind variation
+        // Seed based on current time for smooth variation
+        const windSeed = state.worldState.seed + Math.floor(state.timeOfDay.hour * 100)
+        const windRng = new SeededRandom(windSeed)
+
         return {
           weather: {
             ...state.weather,
             duration: newDuration,
-            windAngle: state.weather.windAngle + (Math.random() - 0.5) * 0.2 * dt,
-            windSpeed: Math.max(0, state.weather.windSpeed + (Math.random() - 0.5) * dt),
+            windAngle: state.weather.windAngle + (windRng.next() - 0.5) * 0.2 * dt,
+            windSpeed: Math.max(0, state.weather.windSpeed + (windRng.next() - 0.5) * dt),
           },
         }
       }),
@@ -285,7 +302,7 @@ export const useGameStore = create<GameStore>()(
           weather: {
             current: newWeather,
             intensity: 0.3 + rng.next() * 0.7,
-            duration: 60 + rng.next() * 240,
+            duration: WEATHER.MIN_DURATION + rng.next() * WEATHER.MAX_ADDITIONAL_DURATION,
             windSpeed,
             windAngle: rng.next() * Math.PI * 2,
           },
@@ -331,32 +348,40 @@ export const useGameStore = create<GameStore>()(
         },
       })),
 
-    // Game actions
+    // Game actions - reset to initial state using constants
     startGame: (seed) =>
       set({
         gameState: 'playing',
         playerPosition: { x: 0, y: 0, z: 0 },
-        playerHealth: { current: 100, maximum: 100, regenRate: 0.5 },
-        playerStamina: { current: 100, maximum: 100, regenRate: 10 },
+        playerHealth: { 
+          current: PLAYER.INITIAL_HEALTH, 
+          maximum: PLAYER.INITIAL_HEALTH, 
+          regenRate: PLAYER.HEALTH_REGEN_RATE 
+        },
+        playerStamina: { 
+          current: PLAYER.INITIAL_STAMINA, 
+          maximum: PLAYER.INITIAL_STAMINA, 
+          regenRate: PLAYER.STAMINA_REGEN_RATE 
+        },
         playerStats: {
-          gold: 0,
+          gold: PLAYER.INITIAL_GOLD,
           score: 0,
           level: 1,
           experience: 0,
-          expToNext: 100,
+          expToNext: LEVELING.BASE_XP_REQUIRED,
           mana: 50,
           maxMana: 50,
         },
         timeOfDay: {
-          hour: 8.0,
+          hour: TIME.STARTING_HOUR,
           phase: TimePhase.DAY,
-          timeScale: 60.0,
+          timeScale: TIME.TIME_SCALE,
           dayCount: 1,
         },
         weather: {
           current: WeatherType.CLEAR,
           intensity: 0.5,
-          duration: 300,
+          duration: WEATHER.MIN_DURATION + WEATHER.MAX_ADDITIONAL_DURATION / 2,
           windSpeed: 0,
           windAngle: 0,
         },

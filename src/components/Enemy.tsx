@@ -6,15 +6,17 @@
 import { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { ENEMY, PLAYER } from '../constants/game'
+import { combatEvents } from '../events/combatEvents'
 
-// Enemy types with different stats
+// Enemy types with different stats (matches GAME_IDENTITY.md)
 const ENEMY_TYPES = [
   { name: 'Slime', color: '#4CAF50', speed: 2, damage: 5, health: 20, xp: 10 },
   { name: 'Goblin', color: '#8BC34A', speed: 4, damage: 8, health: 30, xp: 20 },
   { name: 'Orc', color: '#795548', speed: 3, damage: 15, health: 50, xp: 35 },
   { name: 'Wraith', color: '#9C27B0', speed: 5, damage: 12, health: 25, xp: 30 },
   { name: 'Wolf', color: '#607D8B', speed: 6, damage: 10, health: 35, xp: 25 },
-]
+] as const
 
 // Seeded random for deterministic spawning
 class SeededRandom {
@@ -27,17 +29,22 @@ class SeededRandom {
   nextInt(max: number): number {
     return Math.floor(this.next() * max)
   }
+  // Seeded range for wander timing - replaces Math.random() calls
+  nextRange(min: number, max: number): number {
+    return min + this.next() * (max - min)
+  }
 }
 
 interface EnemyData {
   id: number
-  type: typeof ENEMY_TYPES[0]
+  type: typeof ENEMY_TYPES[number]
   position: THREE.Vector3
   health: number
   maxHealth: number
   state: 'idle' | 'wandering' | 'chasing' | 'attacking'
   targetPosition: THREE.Vector3
   stateTimer: number
+  rng: SeededRandom // Each enemy gets its own RNG for behavior variance
 }
 
 interface EnemySystemProps {
@@ -59,19 +66,22 @@ export function EnemySystem({
   const meshRefs = useRef<Map<number, THREE.Mesh>>(new Map())
   const lastAttackRef = useRef<Map<number, number>>(new Map())
 
-  // Initialize enemies
+  // Initialize enemies with seeded randomness
   useEffect(() => {
     const rng = new SeededRandom(seed)
     const enemies: EnemyData[] = []
 
-    // Spawn 10-15 enemies
-    const count = 10 + rng.nextInt(6)
+    // Spawn count based on seed
+    const count = ENEMY.MIN_SPAWN_COUNT + rng.nextInt(ENEMY.MAX_SPAWN_ADDITIONAL)
 
     for (let i = 0; i < count; i++) {
       const type = ENEMY_TYPES[rng.nextInt(ENEMY_TYPES.length)]
-      const x = (rng.next() - 0.5) * 180
-      const z = (rng.next() - 0.5) * 180
+      const x = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
+      const z = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
       const y = heightFunction(x, z) + 0.5
+
+      // Each enemy gets its own seeded RNG for deterministic behavior
+      const enemyRng = new SeededRandom(seed + i * 1000)
 
       enemies.push({
         id: i,
@@ -82,11 +92,36 @@ export function EnemySystem({
         state: 'wandering',
         targetPosition: new THREE.Vector3(x, y, z),
         stateTimer: rng.next() * 5,
+        rng: enemyRng,
       })
     }
 
     enemiesRef.current = enemies
   }, [seed, heightFunction])
+
+  // Subscribe to attack events from combat system
+  useEffect(() => {
+    const unsubscribe = combatEvents.onPlayerAttack((attackPos, range, damage) => {
+      const attackPosition = new THREE.Vector3(attackPos.x, attackPos.y, attackPos.z)
+      
+      enemiesRef.current.forEach((enemy) => {
+        if (enemy.health <= 0) return
+        
+        const dist = enemy.position.distanceTo(attackPosition)
+        if (dist <= range) {
+          // Enemy in range - apply damage
+          enemy.health -= damage
+          if (enemy.health <= 0) {
+            // Enemy defeated
+            const goldReward = Math.floor(enemy.type.xp / 2)
+            onEnemyDefeated(enemy.type.xp, goldReward)
+          }
+        }
+      })
+    })
+
+    return unsubscribe
+  }, [onEnemyDefeated])
 
   // Enemy AI update
   useFrame((_, delta) => {
@@ -100,27 +135,24 @@ export function EnemySystem({
 
       const distToPlayer = enemy.position.distanceTo(playerPos)
 
-      // State machine
+      // State machine with constants
       enemy.stateTimer -= delta
 
-      // Detection range
-      const detectRange = 20
-      const attackRange = 2
-
-      if (distToPlayer < attackRange) {
+      if (distToPlayer < ENEMY.ATTACK_RANGE) {
         enemy.state = 'attacking'
-      } else if (distToPlayer < detectRange) {
+      } else if (distToPlayer < ENEMY.DETECTION_RANGE) {
         enemy.state = 'chasing'
       } else if (enemy.stateTimer <= 0) {
         enemy.state = enemy.state === 'idle' ? 'wandering' : 'idle'
-        enemy.stateTimer = 2 + Math.random() * 3
+        // Use seeded RNG for deterministic behavior
+        enemy.stateTimer = enemy.rng.nextRange(ENEMY.MIN_WANDER_TIME, ENEMY.MAX_WANDER_TIME)
 
         if (enemy.state === 'wandering') {
-          // Pick random wander target
+          // Pick seeded random wander target
           enemy.targetPosition.set(
-            enemy.position.x + (Math.random() - 0.5) * 20,
+            enemy.position.x + (enemy.rng.next() - 0.5) * ENEMY.WANDER_RANGE,
             enemy.position.y,
-            enemy.position.z + (Math.random() - 0.5) * 20
+            enemy.position.z + (enemy.rng.next() - 0.5) * ENEMY.WANDER_RANGE
           )
         }
       }
@@ -140,9 +172,9 @@ export function EnemySystem({
         enemy.position.x += moveDir.x * speed * delta
         enemy.position.z += moveDir.z * speed * delta
 
-        // Clamp to bounds
-        enemy.position.x = Math.max(-95, Math.min(95, enemy.position.x))
-        enemy.position.z = Math.max(-95, Math.min(95, enemy.position.z))
+        // Clamp to bounds (use same as player)
+        enemy.position.x = Math.max(-PLAYER.WORLD_BOUNDS, Math.min(PLAYER.WORLD_BOUNDS, enemy.position.x))
+        enemy.position.z = Math.max(-PLAYER.WORLD_BOUNDS, Math.min(PLAYER.WORLD_BOUNDS, enemy.position.z))
 
         // Update Y to terrain
         const terrainY = heightFunction(enemy.position.x, enemy.position.z)
@@ -153,7 +185,7 @@ export function EnemySystem({
       if (enemy.state === 'attacking') {
         const lastAttack = lastAttackRef.current.get(enemy.id) || 0
         const now = Date.now()
-        if (now - lastAttack > 1000) { // Attack every 1 second
+        if (now - lastAttack > ENEMY.ATTACK_COOLDOWN) {
           onPlayerDamage(enemy.type.damage)
           lastAttackRef.current.set(enemy.id, now)
         }
@@ -166,28 +198,6 @@ export function EnemySystem({
       }
     })
   })
-
-  // Handle enemy damage (called from combat)
-  const damageEnemy = (enemyId: number, damage: number) => {
-    const enemy = enemiesRef.current.find(e => e.id === enemyId)
-    if (enemy && enemy.health > 0) {
-      enemy.health -= damage
-      if (enemy.health <= 0) {
-        // Enemy defeated
-        const goldReward = Math.floor(enemy.type.xp / 2)
-        onEnemyDefeated(enemy.type.xp, goldReward)
-      }
-    }
-  }
-
-  // Expose damageEnemy through window for combat system
-  useEffect(() => {
-    (window as unknown as { damageEnemy: typeof damageEnemy }).damageEnemy = damageEnemy
-    return () => {
-      delete (window as unknown as { damageEnemy?: typeof damageEnemy }).damageEnemy
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onEnemyDefeated])
 
   return (
     <group>

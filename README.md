@@ -59,11 +59,17 @@ src/
 │   ├── Player.tsx          # Player character with WASD movement
 │   ├── Enemy.tsx           # Enemy AI and spawning system
 │   └── Combat.tsx          # Attack mechanics and damage
+├── constants/
+│   └── game.ts             # Centralized game configuration
+├── events/
+│   └── combatEvents.ts     # Decoupled event communication
 ├── store/
 │   └── gameStore.ts        # Zustand state management
 └── types/
     └── game.ts             # TypeScript type definitions
 ```
+
+See [GAME_IDENTITY.md](./GAME_IDENTITY.md) for the complete game vision and design document.
 
 ## 🎮 Controls
 

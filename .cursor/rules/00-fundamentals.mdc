@@ -57,10 +57,10 @@ GH_TOKEN="$GITHUB_TOKEN" gh <command>
 ```typescript
 // Terrain generation
 import { fbm } from '@jbcom/strata'
-const height = fbm(x * 0.02, z * 0.02, 6, 2.2, seed)
+const height = fbm(x, y, z, octaves)  // Correct signature
 
-// Vegetation
-import { createGrassInstances, createTreeInstances } from '@jbcom/strata'
+// Vegetation  
+import { GrassInstances, TreeInstances, RockInstances } from '@jbcom/strata'
 
 // Weather
 import { ProceduralSky, Rain, Snow } from '@jbcom/strata'
@@ -68,3 +68,24 @@ import { ProceduralSky, Rain, Snow } from '@jbcom/strata'
 // Post-processing
 import { CinematicEffects } from '@jbcom/strata'
 ```
+
+## Code Architecture
+
+```typescript
+// Use constants for magic numbers
+import { PLAYER, ENEMY, TIME } from '../constants/game'
+
+// Use events for decoupled communication
+import { combatEvents } from '../events/combatEvents'
+
+// Use Zustand for state
+import { useGameStore } from '../store/gameStore'
+```
+
+## Game Identity
+
+See [GAME_IDENTITY.md](./GAME_IDENTITY.md) for:
+- Core vision and design pillars
+- Visual identity and colors
+- Gameplay loop and progression
+- Enemy types and biomes

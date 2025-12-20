@@ -3,10 +3,12 @@
  * Ported from Python combat logic in game.py
  */
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGameStore } from '../store/gameStore'
+import { PLAYER } from '../constants/game'
+import { combatEvents } from '../events/combatEvents'
 
 interface DamageIndicator {
   id: number
@@ -19,26 +21,74 @@ interface CombatSystemProps {
   playerPosition: { x: number; y: number; z: number }
 }
 
+// Seeded random for deterministic visual effects
+class VisualRandom {
+  private seed: number
+  constructor(seed: number) { this.seed = seed }
+  next(): number {
+    this.seed = (this.seed * 9301 + 49297) % 233280
+    return this.seed / 233280
+  }
+}
+
 export function CombatSystem({ playerPosition }: CombatSystemProps) {
   const [indicators, setIndicators] = useState<DamageIndicator[]>([])
   const attackCooldownRef = useRef(0)
   const idCounterRef = useRef(0)
+  const visualRngRef = useRef(new VisualRandom(Date.now()))
 
   const { playerStats } = useGameStore()
+
+  // Calculate attack damage
+  const getAttackDamage = useCallback(() => {
+    return PLAYER.BASE_DAMAGE + playerStats.level * PLAYER.DAMAGE_PER_LEVEL
+  }, [playerStats.level])
+
+  // Perform attack - emit event to enemy system
+  const performAttack = useCallback(() => {
+    const damage = getAttackDamage()
+
+    // Emit attack event - enemy system will check for hits
+    combatEvents.emitPlayerAttack(
+      playerPosition,
+      PLAYER.ATTACK_RANGE,
+      damage
+    )
+
+    // Show attack indicator with seeded position offset
+    const offsetX = (visualRngRef.current.next() - 0.5) * 2
+    const offsetZ = (visualRngRef.current.next() - 0.5) * 2
+
+    const newIndicator: DamageIndicator = {
+      id: idCounterRef.current++,
+      position: new THREE.Vector3(
+        playerPosition.x + offsetX,
+        playerPosition.y + 1.5,
+        playerPosition.z + offsetZ
+      ),
+      damage,
+      time: 0,
+    }
+
+    setIndicators((prev) => [...prev, newIndicator])
+  }, [playerPosition, getAttackDamage])
 
   // Attack input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' && attackCooldownRef.current <= 0) {
         performAttack()
-        attackCooldownRef.current = 0.5 // 0.5 second cooldown
+        attackCooldownRef.current = PLAYER.ATTACK_COOLDOWN
       }
     }
 
-    const handleClick = () => {
+    const handleClick = (e: MouseEvent) => {
+      // Ignore clicks on UI elements
+      if ((e.target as HTMLElement).closest('button, .MuiButton-root')) return
+      
       if (attackCooldownRef.current <= 0) {
         performAttack()
-        attackCooldownRef.current = 0.5
+        attackCooldownRef.current = PLAYER.ATTACK_COOLDOWN
       }
     }
 
@@ -49,36 +99,7 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('click', handleClick)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playerPosition, playerStats.level])
-
-  const performAttack = () => {
-    // Base damage + level bonus
-    const baseDamage = 10 + playerStats.level * 2
-
-    // Check for enemies in range (attack range = 3 units)
-    const damageEnemy = (window as unknown as { damageEnemy?: (id: number, damage: number) => void }).damageEnemy
-
-    // In a full implementation, we'd check collision with enemies within range
-    // For now, the enemy system handles proximity-based combat
-    if (damageEnemy) {
-      // Enemies handle their own attack logic based on proximity
-    }
-
-    // Show attack indicator
-    const newIndicator: DamageIndicator = {
-      id: idCounterRef.current++,
-      position: new THREE.Vector3(
-        playerPosition.x + (Math.random() - 0.5) * 2,
-        playerPosition.y + 1.5,
-        playerPosition.z + (Math.random() - 0.5) * 2
-      ),
-      damage: baseDamage,
-      time: 0,
-    }
-
-    setIndicators((prev) => [...prev, newIndicator])
-  }
+  }, [performAttack])
 
   // Update cooldown and indicators
   useFrame((_, delta) => {
@@ -86,12 +107,13 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
       attackCooldownRef.current -= delta
     }
 
-    // Update indicators
-    setIndicators((prev) =>
-      prev
+    // Update indicators - only update when there are indicators
+    setIndicators((prev) => {
+      if (prev.length === 0) return prev
+      return prev
         .map((ind) => ({ ...ind, time: ind.time + delta }))
         .filter((ind) => ind.time < 1) // Remove after 1 second
-    )
+    })
   })
 
   return (
@@ -102,7 +124,7 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
           position={[playerPosition.x, 0.02, playerPosition.z]}
           rotation={[-Math.PI / 2, 0, 0]}
         >
-          <ringGeometry args={[2.8, 3, 32]} />
+          <ringGeometry args={[PLAYER.ATTACK_RANGE - 0.2, PLAYER.ATTACK_RANGE, 32]} />
           <meshBasicMaterial color="#f44336" transparent opacity={0.5} />
         </mesh>
       )}

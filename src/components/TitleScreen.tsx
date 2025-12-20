@@ -9,12 +9,13 @@ import { useGameStore } from '../store/gameStore'
 export function TitleScreen() {
   const { startGame } = useGameStore()
 
+  // Core features from GAME_IDENTITY.md design pillars
   const features = [
-    'Infinite procedural world',
-    'Dynamic biome system',
-    'Weather & day/night cycle',
-    'Adaptive enemy spawning',
-    'Exploration-based gameplay',
+    'Infinite procedural worlds from seeds',
+    'Dynamic biomes: marsh, forest, desert, tundra',
+    'Challenging enemy encounters & combat',
+    'Weather & day/night affect gameplay',
+    'Level up and grow stronger',
   ]
 
   return (
@@ -57,7 +58,7 @@ export function TitleScreen() {
           RECKONING
         </Typography>
 
-        {/* Subtitle */}
+        {/* Tagline - matches GAME_IDENTITY.md */}
         <Typography
           variant="h6"
           sx={{
@@ -66,7 +67,7 @@ export function TitleScreen() {
             fontStyle: 'italic',
           }}
         >
-          A Procedural Adventure
+          Where every river leads to adventure
         </Typography>
 
         {/* Features */}
