@@ -1,50 +1,48 @@
----
-description: Fundamental rules for Rivers of Reckoning development
-globs: "**/*"
-alwaysApply: true
----
-
 # Fundamentals - Rivers of Reckoning
 
 ## 🌊 Project Identity
 
-**Rivers of Reckoning** is a web-first procedural roguelike RPG. Players explore infinite generated worlds directly in their browser.
+**Rivers of Reckoning** is a web-first procedural 3D roguelike RPG. Players explore infinite generated worlds directly in their browser.
 
 ### Core Constraints
 
-1. **Web-First**: Browser is primary. No desktop-only features.
-2. **One Entry Point**: `main.py` only. No alternate entry points.
-3. **Async Always**: All code pygbag-compatible (async/await).
-4. **Responsive**: Auto-scales to any screen via `pygame.SCALED`.
+1. **Web-First**: Browser is primary. Works on desktop and mobile.
+2. **TypeScript Only**: No Python code. Use React + Three.js.
+3. **Strata Powered**: Use @jbcom/strata for terrain, vegetation, weather, AI.
+4. **Responsive**: Works on any screen size.
 5. **Procedural**: No hardcoded content. Everything from seeds.
 
 ### Tech Stack
 
-- pygame-ce + pygbag for web deployment
-- opensimplex for procedural generation
-- esper for ECS architecture
+- @jbcom/strata for 3D procedural generation
+- React Three Fiber for 3D rendering
+- Material-UI for game UI
+- Zustand for state management
+- Vite for builds
+- Playwright for testing
 
 ## Before Acting
 
 1. **Read before modifying** - Always read the file/code before editing
-2. **Run builds after changes** - Verify with `pytest` and `flake8`
+2. **Run builds after changes** - Verify with `pnpm typecheck && pnpm lint`
 3. **Check git status** - Know what you're committing
-4. **Test the game** - Run `python main.py` to verify
+4. **Test the game** - Run `pnpm dev` to verify
 
 ## Making Changes
 
 1. **One concern per commit** - Keep commits focused
 2. **Run linters/tests locally** before pushing
 3. **Don't consolidate code** without verifying the build
-4. **Keep it async** - No blocking patterns
+4. **Use Strata APIs correctly** - Check PUBLIC_API.md, don't hallucinate
 
 ## Quick Commands
 
 ```bash
-python main.py          # Run game
-pytest -v               # Run tests
-flake8 src/             # Lint
-python -m pygbag .      # Build for web
+pnpm dev          # Start dev server
+pnpm build        # Production build
+pnpm test:e2e     # Run Playwright tests
+pnpm lint         # ESLint
+pnpm typecheck    # TypeScript check
 ```
 
 ## Authentication
@@ -54,12 +52,19 @@ python -m pygbag .      # Build for web
 GH_TOKEN="$GITHUB_TOKEN" gh <command>
 ```
 
-## Session Management
+## Strata API Essentials
 
-```bash
-# Start of session
-cat memory-bank/activeContext.md 2>/dev/null || echo "No memory bank"
+```typescript
+// Terrain generation
+import { fbm } from '@jbcom/strata'
+const height = fbm(x * 0.02, z * 0.02, 6, 2.2, seed)
 
-# End of session - update context
-echo "## Session: $(date +%Y-%m-%d)" >> memory-bank/activeContext.md
+// Vegetation
+import { createGrassInstances, createTreeInstances } from '@jbcom/strata'
+
+// Weather
+import { ProceduralSky, Rain, Snow } from '@jbcom/strata'
+
+// Post-processing
+import { CinematicEffects } from '@jbcom/strata'
 ```

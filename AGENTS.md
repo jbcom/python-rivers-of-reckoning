@@ -1,107 +1,119 @@
 # AGENTS.md - Rivers of Reckoning
 
-> **Instructions for AI agents working on this web-first procedural RPG**
+> **Instructions for AI agents working on this 3D procedural RPG**
 
 ## 🌊 Game Identity
 
-**Rivers of Reckoning** is a browser-based roguelike RPG where players explore infinite procedurally generated worlds. The game is designed for **instant web play**—click a link and you're adventuring.
+**Rivers of Reckoning** is a browser-based 3D roguelike RPG where players explore infinite procedurally generated worlds. Built with TypeScript, React Three Fiber, and [@jbcom/strata](https://www.npmjs.com/package/@jbcom/strata).
 
 ### Mission Statement
 
 *Create an immersive, endlessly replayable adventure that runs perfectly in any web browser, with no downloads, no installs, and no waiting.*
 
-### Core Experience
-
-- **Exploration**: Discover biomes, secrets, and challenges in an infinite world
-- **Survival**: Manage health, avoid hazards, defeat enemies
-- **Progression**: Grow stronger, unlock abilities, achieve high scores
-- **Sharing**: Share world seeds with friends for the same adventure
-
 ## 🎯 Design Principles
 
 | Principle | What It Means |
 |-----------|---------------|
-| **Web-First** | Browser is the primary platform. No desktop-only features. |
-| **Instant Play** | Game loads fast and starts immediately. No setup required. |
-| **Responsive** | Scales perfectly from phone to 4K monitor. |
-| **Procedural** | Everything generated from seeds. Infinite variety. |
-| **Juicy** | Satisfying feedback for every action. |
-| **Accessible** | Simple to learn, clear UI, inclusive design. |
+| **Web-First** | Browser is the primary platform |
+| **Instant Play** | Game loads fast and starts immediately |
+| **Procedural** | Everything generated from seeds |
+| **Responsive** | Works on desktop, tablet, and mobile |
+| **Performant** | 60fps target with efficient rendering |
 
 ## 🛠 Technology
 
 | Layer | Tech | Why |
 |-------|------|-----|
-| Engine | pygame-ce | Modern pygame fork, great for 2D |
-| Web | pygbag | Compiles Python to WebAssembly |
-| World Gen | opensimplex | Coherent noise for natural terrain |
-| Architecture | esper | Clean ECS pattern |
+| 3D Engine | @jbcom/strata | Procedural terrain, vegetation, weather, audio, AI |
+| Rendering | React Three Fiber | React-style Three.js development |
+| UI | Material-UI | Consistent, accessible UI components |
+| State | Zustand | Fast, simple state management |
+| Build | Vite | Modern, fast bundler |
+| Tests | Playwright | Cross-browser E2E testing |
+| Mobile | Capacitor | Native iOS/Android deployment |
 
 ## 📁 Structure
 
 ```
-main.py                      # Single async entry point
-src/first_python_rpg/
-├── engine.py                # Responsive auto-scaling engine
-├── game.py                  # Game loop and state machine
-├── world_gen.py             # Procedural generation
-├── systems.py               # ECS components/processors
-├── map.py                   # Infinite camera-based map
-├── player.py                # Player entity
-├── enemy.py                 # Enemy AI
-└── map_data.py              # Game data/constants
+src/
+├── App.tsx                 # Main 3D game scene
+├── main.tsx                # React entry point
+├── components/             # UI components
+│   ├── TitleScreen.tsx
+│   ├── GameHUD.tsx
+│   ├── PauseMenu.tsx
+│   └── GameOverScreen.tsx
+├── store/
+│   └── gameStore.ts        # Zustand state
+└── types/
+    └── game.ts             # TypeScript types
 ```
 
 ## 🔧 Commands
 
 ```bash
-python main.py          # Run the game
-pytest -v               # Run tests
-flake8 src/             # Lint code
-python -m pygbag .      # Build for web
-uv lock && uv sync      # Update dependencies
+pnpm dev            # Start dev server
+pnpm build          # Production build
+pnpm test:e2e       # Run Playwright tests
+pnpm lint           # ESLint
+pnpm typecheck      # TypeScript check
 ```
 
 ## ✅ Agent Checklist
 
 Before making changes:
-- [ ] Understand the web-first constraint
-- [ ] Read recent commits for patterns
-- [ ] Run tests to confirm clean state
+- [ ] Understand the Strata API
+- [ ] Read existing code patterns
+- [ ] Run `pnpm typecheck` to confirm clean state
 
 When making changes:
-- [ ] Keep code async-compatible (no blocking)
-- [ ] Test that `python main.py` runs
-- [ ] Ensure all tests pass
-- [ ] Follow conventional commits
+- [ ] Use real Strata APIs (no hallucinated components)
+- [ ] Test that `pnpm dev` runs
+- [ ] Ensure type checks pass
+- [ ] Follow React/Three.js best practices
 
 After changes:
-- [ ] Lint passes
-- [ ] Tests pass
-- [ ] Documentation updated if needed
+- [ ] `pnpm lint` passes
+- [ ] `pnpm test:e2e` passes
+- [ ] Update docs if needed
 
 ## ❌ What NOT to Do
 
-- **Don't** add desktop-only features (file dialogs, subprocess, etc.)
-- **Don't** use synchronous/blocking patterns
-- **Don't** create multiple entry points (there is ONE `main.py`)
-- **Don't** hardcode content (everything should be procedural)
-- **Don't** break the responsive scaling
+- **Don't** hallucinate Strata APIs - check PUBLIC_API.md
+- **Don't** use setInterval for game loops - use useFrame
+- **Don't** use Math.random() for procedural content - use seeded RNG
+- **Don't** make blocking synchronous calls
+- **Don't** add Python code - this is TypeScript only
 
-## 🎨 Visual Style
+## 🎨 Key Strata APIs
 
-- **Resolution**: 256x256 logical, auto-scaled
-- **Palette**: 16 retro colors
-- **Style**: Clear pixel art, readable at any size
-- **Feedback**: Visual confirmation for all actions
+```typescript
+// Core algorithms
+import { fbm, noise3D } from '@jbcom/strata'
+
+// Vegetation
+import { createGrassInstances, createTreeInstances, createRockInstances } from '@jbcom/strata'
+
+// Components
+import { ProceduralSky, Rain, Snow } from '@jbcom/strata'
+
+// Post-processing
+import { CinematicEffects, RealisticEffects } from '@jbcom/strata'
+
+// AI (YukaJS integration)
+import { YukaEntityManager, YukaVehicle, YukaStateMachine } from '@jbcom/strata'
+
+// State presets
+import { RPG_STATE_PRESET, getStatePreset } from '@jbcom/strata'
+```
 
 ## 📝 Commit Format
 
 ```
-feat(world): add desert biome generation
-fix(combat): correct damage calculation
-docs: update README with new controls
-test: add procedural map variety tests
+feat(terrain): add river valley generation
+fix(weather): correct rain particle direction
+docs: update strata integration guide
+test: add biome transition tests
 chore: update dependencies
 ```
 
@@ -109,22 +121,21 @@ chore: update dependencies
 
 | File | Purpose |
 |------|---------|
-| `main.py` | The only entry point |
-| `engine.py` | Pygame wrapper with scaling |
-| `world_gen.py` | Procedural world generation |
-| `game.py` | Main game class |
+| `src/App.tsx` | Main 3D scene composition |
+| `src/store/gameStore.ts` | Game state management |
+| `src/types/game.ts` | TypeScript definitions |
+| `src/components/GameHUD.tsx` | In-game UI overlay |
 
 ## Agent-Specific Notes
 
 ### Claude
 - Focus on architecture and complex refactoring
-- Can make cross-file changes
-- Check CLAUDE.md for detailed guidance
+- Verify Strata API usage against actual docs
 
 ### Copilot
 - Good for targeted fixes and feature additions
-- Check .github/copilot-instructions.md
+- Check component patterns in existing code
 
 ### Cursor
 - IDE-integrated development
-- Check .cursor/rules/*.mdc for context
+- Use .cursor/rules/*.mdc for context

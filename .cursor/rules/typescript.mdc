@@ -1,0 +1,133 @@
+# TypeScript Standards - Rivers of Reckoning
+
+## Stack
+
+- TypeScript 5.x strict mode
+- React 18 with functional components
+- React Three Fiber for 3D
+- @jbcom/strata for procedural generation
+- Zustand for state management
+- Material-UI for UI components
+
+## Code Style
+
+```typescript
+// Use functional components with TypeScript
+function MyComponent({ prop }: MyComponentProps) {
+  return <mesh />
+}
+
+// Use hooks for state and effects
+const { gameState, playerHealth } = useGameStore()
+
+// Use useFrame for game loop updates
+useFrame((_, deltaTime) => {
+  updateTime(deltaTime)
+})
+
+// Use useMemo for expensive computations
+const terrain = useMemo(() => generateTerrain(seed), [seed])
+
+// Use useCallback for stable function references
+const handleClick = useCallback(() => {
+  startGame()
+}, [startGame])
+```
+
+## Game Loop Pattern
+
+```typescript
+// CORRECT: Use useFrame (requestAnimationFrame)
+function GameLoop() {
+  const { updateTime, updateWeather } = useGameStore()
+  
+  useFrame((_, deltaTime) => {
+    updateTime(deltaTime)
+    updateWeather(deltaTime)
+  })
+  
+  return null
+}
+
+// WRONG: Don't use setInterval
+// setInterval(() => update(), 16) // ❌
+```
+
+## Seeded Randomness
+
+```typescript
+// CORRECT: Use seeded random for procedural content
+class SeededRandom {
+  private seed: number
+  constructor(seed: number) { this.seed = seed }
+  next(): number {
+    this.seed = (this.seed * 9301 + 49297) % 233280
+    return this.seed / 233280
+  }
+}
+
+// WRONG: Don't use Math.random() for game content
+// const biome = Math.random() > 0.5 ? 'forest' : 'desert' // ❌
+```
+
+## Strata API Usage
+
+```typescript
+// Import only real Strata exports
+import {
+  fbm,                          // Core noise function
+  createGrassInstances,         // Vegetation
+  createTreeInstances,
+  createRockInstances,
+  ProceduralSky,                // Sky component
+  Rain, Snow,                   // Weather effects
+  CinematicEffects,             // Post-processing
+} from '@jbcom/strata'
+
+// Generate terrain with fbm
+const height = fbm(x * 0.02, z * 0.02, 6, 2.2, seed)
+
+// Create instanced vegetation
+const grass = createGrassInstances(5000, areaSize, biomes, {
+  heightFunction,
+  seed,
+  enableWind: true,
+})
+```
+
+## State Management
+
+```typescript
+// Use Zustand store for game state
+import { create } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
+
+export const useGameStore = create<GameStore>()(
+  subscribeWithSelector((set, get) => ({
+    gameState: 'title',
+    startGame: () => set({ gameState: 'playing' }),
+    // ...
+  }))
+)
+```
+
+## File Organization
+
+```
+src/
+├── App.tsx                 # Main 3D scene
+├── main.tsx                # Entry point
+├── components/             # UI components
+├── store/                  # Zustand stores
+└── types/                  # TypeScript types
+```
+
+## Commands
+
+```bash
+pnpm dev          # Development
+pnpm build        # Production build
+pnpm typecheck    # Type checking
+pnpm lint         # ESLint
+pnpm test:e2e     # Playwright tests
+```

@@ -17,7 +17,6 @@ import {
   TimeOfDay,
   Weather,
   WorldState,
-  BIOME_CONFIGS,
 } from '../types/game'
 
 interface GameStore {
@@ -107,7 +106,7 @@ const getRandomWeather = (seed: number): WeatherType => {
   ]
 
   const total = choices.reduce((sum, [, weight]) => sum + weight, 0)
-  let r = getSeededRandom(seed) * total
+  const r = getSeededRandom(seed) * total
   let cumulative = 0
 
   for (const [weather, weight] of choices) {

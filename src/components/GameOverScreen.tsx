@@ -2,7 +2,7 @@
  * Game Over Screen - Ported from game.py draw_gameover()
  */
 
-import { Box, Typography, Button, Container, Grid } from '@mui/material'
+import { Typography, Button, Container, Grid } from '@mui/material'
 import { Replay, Home } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
 
@@ -19,8 +19,8 @@ export function GameOverScreen() {
   ]
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         width: '100vw',
         height: '100vh',
         display: 'flex',
@@ -47,12 +47,12 @@ export function GameOverScreen() {
         </Typography>
 
         {/* Stats Grid */}
-        <Box
-          sx={{
+        <div
+          style={{
             background: 'rgba(0, 0, 0, 0.5)',
-            borderRadius: 2,
-            p: 3,
-            mb: 4,
+            borderRadius: '8px',
+            padding: '24px',
+            marginBottom: '32px',
             border: '2px solid #333',
           }}
         >
@@ -61,11 +61,11 @@ export function GameOverScreen() {
           </Typography>
           <Grid container spacing={2}>
             {stats.map((stat) => (
-              <Grid item xs={6} key={stat.label}>
-                <Box
-                  sx={{
-                    p: 1,
-                    borderRadius: 1,
+              <Grid item key={stat.label} xs={6}>
+                <div
+                  style={{
+                    padding: '8px',
+                    borderRadius: '4px',
                     background: 'rgba(255, 255, 255, 0.05)',
                   }}
                 >
@@ -81,14 +81,14 @@ export function GameOverScreen() {
                   >
                     {stat.value.toLocaleString()}
                   </Typography>
-                </Box>
+                </div>
               </Grid>
             ))}
           </Grid>
-        </Box>
+        </div>
 
         {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Button
             variant="contained"
             startIcon={<Replay />}
@@ -118,8 +118,8 @@ export function GameOverScreen() {
           >
             MAIN MENU
           </Button>
-        </Box>
+        </div>
       </Container>
-    </Box>
+    </div>
   )
 }

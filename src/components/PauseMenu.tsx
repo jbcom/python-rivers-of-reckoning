@@ -2,7 +2,7 @@
  * Pause Menu - Ported from game.py draw_paused()
  */
 
-import { Box, Typography, Button, Container, Stack } from '@mui/material'
+import { Typography, Button, Container, Stack } from '@mui/material'
 import { PlayArrow, Home, Settings } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
 
@@ -10,8 +10,8 @@ export function PauseMenu() {
   const { resumeGame, resetGame } = useGameStore()
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -26,11 +26,11 @@ export function PauseMenu() {
       }}
     >
       <Container maxWidth="xs">
-        <Box
-          sx={{
+        <div
+          style={{
             background: 'linear-gradient(180deg, #1e1e1e 0%, #2d2d2d 100%)',
-            borderRadius: 2,
-            p: 4,
+            borderRadius: '8px',
+            padding: '32px',
             border: '2px solid #4CAF50',
             boxShadow: '0 0 30px rgba(76, 175, 80, 0.3)',
             textAlign: 'center',
@@ -109,8 +109,8 @@ export function PauseMenu() {
           >
             Press ESC to resume
           </Typography>
-        </Box>
+        </div>
       </Container>
-    </Box>
+    </div>
   )
 }

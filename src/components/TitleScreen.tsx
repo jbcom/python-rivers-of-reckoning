@@ -2,7 +2,7 @@
  * Title Screen - Ported from game.py draw_title()
  */
 
-import { Box, Typography, Button, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
+import { Typography, Button, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
 import { PlayArrow, Star } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
 
@@ -18,8 +18,8 @@ export function TitleScreen() {
   ]
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         width: '100vw',
         height: '100vh',
         display: 'flex',
@@ -117,6 +117,6 @@ export function TitleScreen() {
           WASD to move • Mouse to look • ESC to pause
         </Typography>
       </Container>
-    </Box>
+    </div>
   )
 }

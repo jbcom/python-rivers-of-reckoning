@@ -1,200 +1,166 @@
 # Rivers of Reckoning
 
-**A fully procedural 3D RPG with Strata - Complete game in ~100 lines** 🎮
+> **An immersive, procedurally generated 3D roguelike RPG built for instant web play**
+
+[![Node.js CI](https://github.com/jbcom/nodejs-rivers-of-reckoning/actions/workflows/nodejs-app.yml/badge.svg)](https://github.com/jbcom/nodejs-rivers-of-reckoning/actions/workflows/nodejs-app.yml)
+
+## 🌊 The Vision
+
+**Rivers of Reckoning** is a browser-based adventure where players explore an infinite, ever-changing world of marshes, forests, deserts, and tundra. Every playthrough is unique—generated from a seed that creates coherent biomes, dynamic weather, and challenging encounters.
+
+### Player Experience Goals
+
+- **Instant Play**: Click and you're in. No downloads, no installs, no waiting.
+- **One More Turn**: Addictive exploration loop - "what's over that next hill?"
+- **Tactile Feedback**: Responsive controls, satisfying combat, clear visual feedback
+- **Mobile-Friendly**: Touch controls that feel native, not bolted-on
+- **Shareable Worlds**: Share your seed with friends to explore the same world
+- **Persistent Progress**: Local storage saves your best runs and achievements
+
+## 🛠 Technology Stack
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **3D Engine** | [@jbcom/strata](https://www.npmjs.com/package/@jbcom/strata) | Procedural terrain, vegetation, weather, audio, AI |
+| **3D Rendering** | React Three Fiber + Three.js | WebGL rendering in React |
+| **UI Framework** | Material-UI (MUI) | Responsive game UI and menus |
+| **State Management** | Zustand | Fast, lightweight game state |
+| **Build Tool** | Vite | Fast development and production builds |
+| **Testing** | Playwright | End-to-end browser testing |
+| **Cross-Platform** | Capacitor | Native mobile deployment (iOS/Android) |
 
 ## 🚀 Quick Start
 
 ```bash
+# Install dependencies
 pnpm install
+
+# Start development server
 pnpm dev
+
+# Build for production
+pnpm build
+
+# Run end-to-end tests
+pnpm test:e2e
 ```
-
-Open http://localhost:3000 and start exploring!
-
-## 🎮 What Is This?
-
-Rivers of Reckoning is a **fully procedural 3D RPG** showcasing the power of [Strata](https://github.com/jbcom/nodejs-strata). What used to require 2,000+ lines of Python is now ~100 lines of declarative TypeScript with:
-
-- 🌍 **Infinite procedural terrain** across 5 biomes
-- 🎵 **Procedural audio** - adaptive music & ambient sounds
-- ⚡ **Event-driven gameplay** with Strata Triggers
-- 🎮 **Full game loop** - combat, loot, progression
-
-## ✨ Features
-
-### Core Systems (All Built-In)
-
-- 🌍 **Procedural Terrain** - GPU-powered with 5 unique biomes
-- 💧 **Realistic Water** - Caustics, foam, flow simulation  
-- 🌤️ **Dynamic Weather** - Rain, fog, snow, storms
-- 🌅 **Day/Night Cycle** - Volumetric sky with time progression
-- 🌲 **Vegetation** - Instanced grass, trees, rocks (8,000+ objects)
-- 🎮 **Player Character** - Full 3D controller with physics
-- 🎨 **Game State** - Built-in management system
-- 📊 **HUD Components** - Health, stats, UI overlays
-
-### Audio System
-
-**Procedural Audio** powered by Strata:
-- 🎵 **Adaptive Music** - Changes with gameplay, biome, time
-- 🌊 **Ambient Sounds** - Biome-specific atmospheres
-- ⛈️ **Weather Effects** - Rain, wind, thunder
-- 👣 **Movement Sounds** - Footsteps, water splashes
-- 🍃 **Environment** - Rustling vegetation, flowing water
-
-### Game Events (Strata Triggers)
-
-**Spatial Triggers:**
-- 🗺️ Biome transitions with visual/audio effects
-- ⚔️ Random enemy encounters (10% frequency)
-- 💰 Loot spawns (gold, health, items)
-
-**Temporal Triggers:**
-- 🕐 Weather changes every 5 minutes
-- 🌅 Dawn/dusk/midnight events
-- ⏰ Dynamic time-based gameplay
-
-**Conditional Triggers:**
-- ❤️ Low health warnings (< 25%)
-- ⭐ Level-up celebrations
-- 🎯 Achievement unlocks
-
-**Interactive Triggers:**
-- 🔍 Examine objects (E key)
-- 📦 Collect items (F key)
-- 💬 Context-sensitive interactions
-
-### Biomes
-
-1. **Marsh** 🌿 - Water-heavy wetlands (temp: moderate, moisture: high)
-2. **Forest** 🌲 - Dense woodland (temp: moderate, moisture: medium)
-3. **Desert** 🏜️ - Arid wasteland (temp: hot, moisture: low)
-4. **Tundra** ❄️ - Frozen landscape (temp: cold, moisture: variable)
-5. **Grassland** 🌾 - Open plains (temp: moderate, moisture: low)
 
 ## 📁 Project Structure
 
 ```
-.
-├── src/
-│   ├── App.tsx          # The entire game (~100 lines)
-│   └── main.tsx         # React entry point
-├── tests/
-│   ├── game.spec.ts     # 8 comprehensive E2E tests
-│   └── README.md        # Test documentation
-├── public/
-│   └── index.html
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
+src/
+├── App.tsx                 # Main game component with 3D scene
+├── main.tsx                # React entry point
+├── components/
+│   ├── TitleScreen.tsx     # Game title and start menu
+│   ├── GameHUD.tsx         # In-game HUD (health, stamina, weather)
+│   ├── PauseMenu.tsx       # Pause overlay
+│   └── GameOverScreen.tsx  # End game stats and restart
+├── store/
+│   └── gameStore.ts        # Zustand state management
+└── types/
+    └── game.ts             # TypeScript type definitions
 ```
 
-## 🧪 Testing
+## 🎮 Game Features
 
-Comprehensive E2E tests with Playwright across 3 browsers:
+### Procedural World Generation
+- **Terrain**: Multi-octave FBM noise creates realistic hills, valleys, and rivers
+- **Biomes**: Temperature and moisture maps determine grassland, forest, desert, tundra
+- **Vegetation**: Trees, grass, and rocks placed contextually based on biome
 
-```bash
-# Install browsers (first time)
-pnpm exec playwright install
+### Dynamic Systems
+- **Weather**: Clear, rain, fog, snow, storm - affects visibility and gameplay
+- **Day/Night Cycle**: Dawn, day, dusk, night with lighting changes
+- **Time Progression**: Game time flows, affecting NPC behavior and events
 
-# Run tests
-pnpm test:e2e
+### Visual Effects
+- **Procedural Sky**: Dynamic atmospheric rendering
+- **Water**: Animated shader with waves and caustics
+- **Post-Processing**: Bloom, vignette, cinematic effects
 
-# Interactive mode
-pnpm test:e2e:ui
-```
-
-### Test Coverage
-
-✅ Game loads & WebGL initializes  
-✅ Terrain & water rendering  
-✅ Day/night cycle progression  
-✅ Weather system operations  
-✅ Camera controls (mouse)  
-✅ Performance (60+ FPS)  
-✅ Zero console errors  
-✅ Visual verification (screenshots)
-
-## 🎯 Controls
-
-- **Mouse** - Camera rotation/zoom
-- **E** - Examine objects
-- **F** - Collect items
-- **WASD** - Movement (when implemented)
-
-## 🏗️ Build
+## 🎯 Development Commands
 
 ```bash
 # Development
-pnpm dev
+pnpm dev              # Start dev server with hot reload
+pnpm typecheck        # Type-check without emitting
 
-# Production build
-pnpm build
+# Build
+pnpm build            # Production build
+pnpm preview          # Preview production build
 
-# Preview production
-pnpm preview
+# Testing
+pnpm test             # Run unit tests (Vitest)
+pnpm test:e2e         # Run Playwright e2e tests
+pnpm test:e2e:ui      # Run e2e tests with UI
+pnpm test:e2e:debug   # Debug e2e tests
+
+# Code Quality
+pnpm lint             # Run ESLint
+pnpm lint:fix         # Auto-fix lint issues
 ```
 
-## 📚 Documentation
+## 🌍 Cross-Platform Deployment
 
-- [`STRATA_VS_PYGAME.md`](./STRATA_VS_PYGAME.md) - Python comparison
-- [`python-archive/`](./python-archive/) - Archived Python version
-- [`tests/README.md`](./tests/README.md) - Test documentation
+### Web (Primary)
+```bash
+pnpm build
+# Deploy dist/ to any static hosting
+```
 
-## 🎯 The Journey
+### Mobile (Capacitor)
+```bash
+pnpm build
+npx cap sync
+npx cap run android  # or ios
+```
 
-### Before (Python/pygame)
-- ❌ 2,000+ lines of manual code
-- ❌ Broken tests, missing features
-- ❌ No procedural audio
-- ❌ No event system
-- ❌ Can't verify if it works
-- ⏰ Weeks of development
+## 📊 Game Architecture
 
-### After (Strata/TypeScript)
-- ✅ ~100 lines of declarative code
-- ✅ Full test coverage (8 E2E tests)
-- ✅ Procedural audio system
-- ✅ Complete trigger/event system
-- ✅ Verified working in 3 browsers
-- ⏰ Built in hours
+### State Management (Zustand)
+The game uses a centralized Zustand store for all game state:
+- Player position, health, stamina, stats
+- Time of day and weather systems
+- World state and progression tracking
 
-## 🛠️ Tech Stack
+### Strata Integration
+We use [@jbcom/strata](https://www.npmjs.com/package/@jbcom/strata) for:
+- `fbm()` - Fractal Brownian Motion for terrain generation
+- `createGrassInstances()`, `createTreeInstances()`, `createRockInstances()` - Vegetation
+- `ProceduralSky` - Dynamic sky rendering
+- `Rain`, `Snow` - Weather particle effects
+- `CinematicEffects` - Post-processing
 
-- [**Strata**](https://github.com/jbcom/nodejs-strata) - Procedural 3D graphics library
-  - Terrain generation
-  - Water simulation
-  - Procedural audio
-  - Trigger system
-  - Game state management
-- **React Three Fiber** - React renderer for Three.js
-- **TypeScript** - Type safety
-- **Vite** - Build tool & dev server
-- **Playwright** - E2E testing
+## 🎨 Visual Design
 
-## 🚀 Deployment
+- **Palette**: Natural colors that shift with biome and time of day
+- **Style**: Modern 3D with stylized elements
+- **Feedback**: Visual indicators for all game events
 
-The game is deployed automatically via GitHub Actions to GitHub Pages.
+## 📝 Migration from Python
 
-Live demo: *[Coming soon]*
+This project was migrated from a Python/Pygame implementation. The original Python code is archived in `python-archive/` for reference. Key changes:
+
+| Python (Pygame) | TypeScript (Strata) |
+|-----------------|---------------------|
+| Pygame surfaces | React Three Fiber Canvas |
+| esper ECS | Zustand state management |
+| opensimplex | Strata's `fbm()` function |
+| Sprite animations | Three.js meshes + shaders |
+| pygbag (WASM) | Vite + native web |
+
+## 📄 License
+
+MIT License - see LICENSE for details
 
 ## 🤝 Contributing
 
-Contributions welcome! This project demonstrates Strata's capabilities.
-
-Ideas for expansion:
-- Combat system
-- Inventory UI
-- Quest system
-- Multiplayer
-- Save/load
-- More biomes
-
-## 📜 License
-
-MIT
+1. Fork the repository
+2. Create a feature branch
+3. Run tests: `pnpm test:e2e`
+4. Submit a pull request
 
 ---
 
-**Built with [Strata](https://github.com/jbcom/nodejs-strata)** 🎨  
-*Procedural 3D graphics made simple*
+Built with ❤️ using [Strata](https://www.npmjs.com/package/@jbcom/strata), [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), and [Material-UI](https://mui.com/)

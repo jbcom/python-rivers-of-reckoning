@@ -2,7 +2,7 @@
  * Game HUD - Ported from game.py draw_enhanced_hud()
  */
 
-import { Box, Typography, LinearProgress, Chip, Stack } from '@mui/material'
+import { Typography, LinearProgress, Chip, Stack } from '@mui/material'
 import {
   Favorite,
   LocalFireDepartment,
@@ -14,7 +14,7 @@ import {
   FilterDrama,
 } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
-import { BIOME_CONFIGS, WeatherType, TimePhase } from '../types/game'
+import { BIOME_CONFIGS, WeatherType } from '../types/game'
 import { useEffect } from 'react'
 
 const WeatherIcon = ({ weather }: { weather: WeatherType }) => {
@@ -64,13 +64,13 @@ export function GameHUD() {
   return (
     <>
       {/* Top HUD Bar */}
-      <Box
-        sx={{
+      <div
+        style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          p: 2,
+          padding: '16px',
           background: 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
           display: 'flex',
           justifyContent: 'space-between',
@@ -80,9 +80,9 @@ export function GameHUD() {
         }}
       >
         {/* Left: Health & Stamina */}
-        <Box sx={{ width: 200 }}>
+        <div style={{ width: 200 }}>
           {/* Health */}
-          <Box sx={{ mb: 1 }}>
+          <div style={{ marginBottom: '8px' }}>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
               <Favorite sx={{ color: '#f44336', fontSize: 16 }} />
               <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Roboto Mono' }}>
@@ -102,10 +102,10 @@ export function GameHUD() {
                 },
               }}
             />
-          </Box>
+          </div>
 
           {/* Stamina */}
-          <Box>
+          <div>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
               <LocalFireDepartment sx={{ color: '#FF9800', fontSize: 16 }} />
               <Typography variant="caption" sx={{ color: 'white', fontFamily: 'Roboto Mono' }}>
@@ -124,8 +124,8 @@ export function GameHUD() {
                 },
               }}
             />
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* Center: Biome & Weather */}
         <Stack alignItems="center" spacing={1}>
@@ -148,7 +148,7 @@ export function GameHUD() {
         </Stack>
 
         {/* Right: Stats */}
-        <Box sx={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'right' }}>
           <Typography
             variant="body2"
             sx={{ color: '#FFD700', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}
@@ -158,17 +158,17 @@ export function GameHUD() {
           <Typography variant="caption" sx={{ color: 'white', opacity: 0.8 }}>
             Lv.{playerStats.level} • {playerStats.score} pts
           </Typography>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Bottom HUD Bar */}
-      <Box
-        sx={{
+      <div
+        style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
-          p: 1,
+          padding: '8px',
           background: 'linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
           display: 'flex',
           justifyContent: 'space-between',
@@ -196,7 +196,7 @@ export function GameHUD() {
         <Typography variant="caption" sx={{ color: '#888', fontFamily: 'Roboto Mono' }}>
           🏃 {Math.floor(worldState.distanceTraveled)}m
         </Typography>
-      </Box>
+      </div>
     </>
   )
 }
