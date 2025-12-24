@@ -36,7 +36,10 @@ import {
 // Local components
 import { TitleScreen, GameHUD, PauseMenu, GameOverScreen, Player, EnemySystem, CombatSystem } from './components'
 import { useGameStore } from './store/gameStore'
-import { WeatherType } from './types/game'
+import { WeatherType, QuestType } from './types/game'
+import { generateQuest } from './features/questSystem'
+import { triggerRandomEvent } from './features/eventSystem'
+import { useEffect } from 'react'
 
 // =============================================================================
 // HEIGHT FUNCTION (shared for terrain, player, enemies)
@@ -297,7 +300,28 @@ function Scene() {
     addExperience,
     addGold,
     incrementEnemiesDefeated,
+    addQuest,
   } = useGameStore()
+
+  // Periodic Quest & Event System
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const state = useGameStore.getState()
+      
+      // Try to add a quest if we have space
+      if (state.worldState.activeQuests.length < 3 && Math.random() < 0.1) {
+        const newQuest = generateQuest(state.playerStats.level, state.worldState.seed + Date.now())
+        addQuest(newQuest)
+      }
+
+      // Try to trigger a random event
+      if (Math.random() < 0.05) {
+        triggerRandomEvent(state)
+      }
+    }, 10000) // Every 10 seconds check
+
+    return () => clearInterval(interval)
+  }, [addQuest])
 
   // Callbacks for enemy system
   const handleEnemyDefeated = (xp: number, gold: number) => {

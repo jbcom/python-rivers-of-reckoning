@@ -2,12 +2,17 @@
  * Title Screen - Ported from game.py draw_title()
  */
 
-import { Typography, Button, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
-import { PlayArrow, Star } from '@mui/icons-material'
+import { Typography, Button, Container, List, ListItem, ListItemIcon, ListItemText, ButtonGroup } from '@mui/material'
+import { PlayArrow, Star, CloudDownload } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
+import { DIFFICULTY } from '../constants/game'
+import { useState } from 'react'
 
 export function TitleScreen() {
-  const { startGame } = useGameStore()
+  const { startGame, loadGame } = useGameStore()
+  const [difficulty, setDifficulty] = useState<keyof typeof DIFFICULTY>('NORMAL')
+
+  const hasSave = !!localStorage.getItem('rivers_of_reckoning_save')
 
   // Core features from GAME_IDENTITY.md design pillars
   const features = [
@@ -88,27 +93,74 @@ export function TitleScreen() {
           ))}
         </List>
 
-        {/* Start Button */}
-        <Button
-          variant="contained"
-          size="large"
-          startIcon={<PlayArrow />}
-          onClick={() => startGame()}
-          sx={{
-            px: 6,
-            py: 2,
-            fontSize: '1.2rem',
-            fontFamily: '"Press Start 2P", monospace',
-            background: 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)',
-            boxShadow: '0 0 20px rgba(76, 175, 80, 0.5)',
-            '&:hover': {
-              background: 'linear-gradient(45deg, #66BB6A 30%, #9CCC65 90%)',
-              boxShadow: '0 0 30px rgba(76, 175, 80, 0.8)',
-            },
-          }}
-        >
-          START GAME
-        </Button>
+        {/* Difficulty Selection */}
+        <div style={{ marginBottom: '24px' }}>
+          <Typography variant="caption" sx={{ display: 'block', mb: 1, opacity: 0.7 }}>
+            Select Difficulty
+          </Typography>
+          <ButtonGroup variant="outlined" size="small">
+            {(Object.keys(DIFFICULTY) as Array<keyof typeof DIFFICULTY>).map((level) => (
+              <Button
+                key={level}
+                onClick={() => setDifficulty(level)}
+                sx={{
+                  color: difficulty === level ? '#4CAF50' : 'white',
+                  borderColor: difficulty === level ? '#4CAF50' : 'rgba(255,255,255,0.3)',
+                  bgcolor: difficulty === level ? 'rgba(76, 175, 80, 0.1)' : 'transparent',
+                }}
+              >
+                {DIFFICULTY[level].label}
+              </Button>
+            ))}
+          </ButtonGroup>
+        </div>
+
+        {/* Start and Load Buttons */}
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<PlayArrow />}
+            onClick={() => startGame(undefined, difficulty)}
+            sx={{
+              px: 4,
+              py: 2,
+              fontSize: '1rem',
+              fontFamily: '"Press Start 2P", monospace',
+              background: 'linear-gradient(45deg, #4CAF50 30%, #8BC34A 90%)',
+              boxShadow: '0 0 20px rgba(76, 175, 80, 0.5)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #66BB6A 30%, #9CCC65 90%)',
+                boxShadow: '0 0 30px rgba(76, 175, 80, 0.8)',
+              },
+            }}
+          >
+            START
+          </Button>
+
+          {hasSave && (
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<CloudDownload />}
+              onClick={() => loadGame()}
+              sx={{
+                px: 4,
+                py: 2,
+                fontSize: '1rem',
+                fontFamily: '"Press Start 2P", monospace',
+                color: '#2196F3',
+                borderColor: '#2196F3',
+                '&:hover': {
+                  borderColor: '#64B5F6',
+                  bgcolor: 'rgba(33, 150, 243, 0.1)',
+                },
+              }}
+            >
+              LOAD
+            </Button>
+          )}
+        </div>
 
         {/* Controls hint */}
         <Typography

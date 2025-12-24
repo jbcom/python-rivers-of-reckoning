@@ -2,7 +2,7 @@
  * Game HUD - Ported from game.py draw_enhanced_hud()
  */
 
-import { Typography, LinearProgress, Chip, Stack } from '@mui/material'
+import { Typography, LinearProgress, Chip, Stack, Paper, IconButton, Box } from '@mui/material'
 import {
   Favorite,
   LocalFireDepartment,
@@ -12,10 +12,12 @@ import {
   Thunderstorm,
   AcUnit,
   FilterDrama,
+  Save,
+  Assignment,
 } from '@mui/icons-material'
 import { useGameStore } from '../store/gameStore'
 import { BIOME_CONFIGS, WeatherType } from '../types/game'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const WeatherIcon = ({ weather }: { weather: WeatherType }) => {
   switch (weather) {
@@ -44,7 +46,16 @@ export function GameHUD() {
     weather,
     worldState,
     pauseGame,
+    saveGame,
   } = useGameStore()
+
+  const [saveMessage, setSaveMessage] = useState('')
+
+  const handleSave = () => {
+    saveGame()
+    setSaveMessage('Game Saved!')
+    setTimeout(() => setSaveMessage(''), 2000)
+  }
 
   const biomeConfig = BIOME_CONFIGS[worldState.currentBiome]
   const healthPercent = (playerHealth.current / playerHealth.maximum) * 100
@@ -147,18 +158,84 @@ export function GameHUD() {
           </Stack>
         </Stack>
 
-        {/* Right: Stats */}
-        <div style={{ textAlign: 'right' }}>
-          <Typography
-            variant="body2"
-            sx={{ color: '#FFD700', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}
-          >
-            💰 {playerStats.gold}
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'white', opacity: 0.8 }}>
-            Lv.{playerStats.level} • {playerStats.score} pts
-          </Typography>
+        {/* Right: Stats & Save */}
+        <div style={{ textAlign: 'right', pointerEvents: 'auto' }}>
+          <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
+            <div style={{ textAlign: 'right' }}>
+              <Typography
+                variant="body2"
+                sx={{ color: '#FFD700', fontFamily: 'Roboto Mono', fontWeight: 'bold' }}
+              >
+                💰 {playerStats.gold}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'white', opacity: 0.8 }}>
+                Lv.{playerStats.level} • {playerStats.score} pts
+              </Typography>
+            </div>
+            <IconButton onClick={handleSave} size="small" sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}>
+              <Save fontSize="small" />
+            </IconButton>
+          </Stack>
+          {saveMessage && (
+            <Typography variant="caption" sx={{ color: '#4CAF50', display: 'block', mt: 0.5 }}>
+              {saveMessage}
+            </Typography>
+          )}
         </div>
+      </div>
+
+      {/* Quests Overlay */}
+      <div
+        style={{
+          position: 'fixed',
+          top: '80px',
+          right: '16px',
+          width: '200px',
+          pointerEvents: 'none',
+          zIndex: 90,
+        }}
+      >
+        {worldState.activeQuests.length > 0 && (
+          <Paper
+            sx={{
+              p: 1.5,
+              bgcolor: 'rgba(0,0,0,0.6)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'white',
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+              <Assignment sx={{ fontSize: 16, color: '#2196F3' }} />
+              <Typography variant="caption" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
+                ACTIVE QUESTS
+              </Typography>
+            </Stack>
+            {worldState.activeQuests.map((quest) => (
+              <Box key={quest.id} sx={{ mb: 1.5 }}>
+                <Typography variant="caption" sx={{ display: 'block', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                  {quest.title}
+                </Typography>
+                <Typography variant="caption" sx={{ display: 'block', fontSize: '0.6rem', opacity: 0.7, mb: 0.5 }}>
+                  {quest.description}
+                </Typography>
+                <LinearProgress
+                  variant="determinate"
+                  value={(quest.progress / quest.target) * 100}
+                  sx={{
+                    height: 4,
+                    borderRadius: 1,
+                    bgcolor: 'rgba(255,255,255,0.1)',
+                    '& .MuiLinearProgress-bar': { bgcolor: '#2196F3' },
+                  }}
+                />
+                <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', fontSize: '0.6rem', mt: 0.2 }}>
+                  {Math.floor(quest.progress)} / {quest.target}
+                </Typography>
+              </Box>
+            ))}
+          </Paper>
+        )}
       </div>
 
       {/* Bottom HUD Bar */}

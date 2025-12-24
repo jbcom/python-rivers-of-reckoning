@@ -111,6 +111,46 @@ export const LEVELING = {
 } as const
 
 // =============================================================================
+// DIFFICULTY CONSTANTS
+// =============================================================================
+
+export const DIFFICULTY = {
+  EASY: {
+    label: 'Easy',
+    multiplier: 0.8,
+    enemyDamageMult: 0.7,
+    enemyHealthMult: 0.8,
+    goldMult: 1.2,
+    expMult: 1.2,
+  },
+  NORMAL: {
+    label: 'Normal',
+    multiplier: 1.0,
+    enemyDamageMult: 1.0,
+    enemyHealthMult: 1.0,
+    goldMult: 1.0,
+    expMult: 1.0,
+  },
+  HARD: {
+    label: 'Hard',
+    multiplier: 1.5,
+    enemyDamageMult: 1.5,
+    enemyHealthMult: 1.4,
+    goldMult: 1.5,
+    expMult: 1.5,
+  },
+} as const
+
+// =============================================================================
+// QUEST CONSTANTS
+// =============================================================================
+
+export const QUESTS = {
+  MAX_ACTIVE: 3,
+  SPAWN_CHANCE: 0.05, // Chance per biome change
+} as const
+
+// =============================================================================
 // CAMERA CONSTANTS
 // =============================================================================
 

@@ -206,6 +206,48 @@ export interface EnemyState {
 }
 
 // ============================================================================
+// RANDOM EVENTS (new)
+// ============================================================================
+
+export enum EventType {
+  BOON = 'boon',
+  BANE = 'bane',
+  NEUTRAL = 'neutral',
+  TREASURE = 'treasure',
+  ENCOUNTER = 'encounter',
+}
+
+export interface RandomEvent {
+  id: string
+  title: string
+  description: string
+  type: EventType
+  onTrigger: (store: any) => void
+}
+
+// ============================================================================
+// QUEST SYSTEM (new)
+// ============================================================================
+
+export enum QuestType {
+  SLAY = 'slay',
+  EXPLORE = 'explore',
+  COLLECT = 'collect',
+}
+
+export interface Quest {
+  id: string
+  title: string
+  description: string
+  type: QuestType
+  target: number
+  progress: number
+  rewardGold: number
+  rewardExp: number
+  isCompleted: boolean
+}
+
+// ============================================================================
 // GAME STATE
 // ============================================================================
 
@@ -216,6 +258,8 @@ export interface WorldState {
   bossesDefeated: number
   distanceTraveled: number
   seed: number
+  activeQuests: Quest[]
+  availableEvents: RandomEvent[]
 }
 
 export type GameState = 'title' | 'playing' | 'paused' | 'gameover' | 'boss'
