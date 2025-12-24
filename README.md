@@ -172,7 +172,7 @@ This project was migrated from a Python/Pygame implementation. The original Pyth
 | esper ECS | Zustand state management |
 | opensimplex | Strata's `fbm()` function |
 | Sprite animations | Three.js meshes + shaders |
-| pygbag (WASM) | Vite + native web |
+| Vite (native web) | Vite + native web |
 
 ## 📄 License
 

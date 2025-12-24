@@ -1,20 +1,17 @@
 # Render.com deployment configuration for Rivers of Reckoning
-# Builds the game using pygbag for web deployment
+# Builds the game using Vite for web deployment
 
 services:
   - type: web
     name: rivers-of-reckoning
     env: static
     buildCommand: |
-      # Install build dependencies
-      pip install pygame-ce pygbag opensimplex esper
+      # Setup pnpm
+      npm install -g pnpm
       
-      # Install the project package so imports work
-      pip install -e .
+      # Install dependencies
+      pnpm install
       
-      # Create build directory
-      mkdir -p build/web
-      
-      # Build for web using pygbag (main.py is the entry point)
-      python -m pygbag --build build/web .
-    staticPublishPath: ./build/web
+      # Build for web
+      pnpm run build
+    staticPublishPath: ./dist

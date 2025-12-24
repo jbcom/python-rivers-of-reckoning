@@ -2,71 +2,72 @@
 
 ## 🌊 What Is This Game?
 
-Rivers of Reckoning is a **web-first procedural roguelike RPG**. Players explore infinite generated worlds directly in their browser—no downloads, no installs.
+Rivers of Reckoning is a **web-first procedural 3D roguelike RPG**. Players explore infinite generated worlds directly in their browser using React Three Fiber and the Strata engine—no downloads, no installs.
 
 ### The Player Experience
 
-- Click a link → instantly playing
-- Explore marshes, forests, deserts, tundra
-- Every world is unique (generated from seeds)
-- Weather changes, day turns to night
-- Simple controls, deep exploration
+- Click a link → instantly playing in the browser
+- Explore 3D marshes, forests, deserts, tundra
+- Every world is unique (generated from seeds using fbm noise)
+- Dynamic weather system and day/night cycle
+- Responsive controls (Desktop & Mobile)
 
 ## 🎯 Design Rules
 
-1. **Web-First**: Browser is the primary platform
-2. **One Entry Point**: `main.py` is the ONLY entry point
-3. **Async Always**: All code must be pygbag-compatible (async/await)
-4. **Responsive**: Game auto-scales to any screen size
-5. **Procedural**: No hardcoded maps or content
+1. **Web-First**: Browser is the primary platform (Vite/React)
+2. **Procedural**: Everything generated from seeds; no hardcoded maps
+3. **Performant**: Target 60fps using instanced rendering and GPU-accelerated terrain
+4. **Responsive**: Works on desktop, tablet, and mobile (Capacitor support)
+5. **State Management**: Use Zustand for global game state
 
 ## 🛠 Tech Stack
 
-- **pygame-ce**: 2D game engine
-- **pygbag**: Python → WebAssembly for browsers
-- **opensimplex**: Noise-based world generation
-- **esper**: Entity Component System
+- **React Three Fiber**: 3D renderer for React
+- **Three.js**: Underling 3D engine
+- **@jbcom/strata**: Procedural terrain, vegetation, weather, and game systems
+- **Zustand**: Lightweight state management
+- **Material-UI**: Professional UI components for menus and HUD
+- **Vite**: Ultra-fast build tool and dev server
 
 ## 📁 Key Files
 
 ```
-main.py                 # Single entry point (async)
-src/first_python_rpg/
-├── engine.py           # Auto-scaling pygame wrapper
-├── game.py             # Game states and logic
-├── world_gen.py        # Procedural generation
-├── systems.py          # ECS components
-├── map.py              # Infinite scrolling world
-└── player.py           # Player entity
+src/
+├── App.tsx             # Main 3D scene composition
+├── main.tsx            # React entry point
+├── store/
+│   └── gameStore.ts    # Central Zustand state
+├── components/         # React UI components
+│   ├── TitleScreen.tsx
+│   ├── GameHUD.tsx
+│   ├── PauseMenu.tsx
+│   └── GameOverScreen.tsx
+└── types/
+    └── game.ts         # TypeScript definitions
 ```
 
 ## ⚡ Quick Commands
 
 ```bash
-python main.py          # Run game
-pytest -v               # Run tests
-flake8 src/             # Lint
-python -m pygbag .      # Build for web
+pnpm dev                # Run development server
+pnpm build              # Build for production (Vite)
+pnpm test:e2e           # Run Playwright E2E tests
+pnpm lint               # Run ESLint
+pnpm typecheck          # Run TypeScript checks
 ```
 
 ## ✅ When Writing Code
 
-- Use async patterns (pygbag requires it)
-- No blocking calls (no `time.sleep()`, no sync I/O)
-- No desktop-only features (no file dialogs, no subprocess)
-- Follow the 256x256 logical resolution
-- Use the 16-color palette from `engine.py`
-
-## 🎨 Style Guide
-
-- Python 3.10+
-- Conventional commits: `feat:`, `fix:`, `docs:`, `test:`
-- Docstrings for public functions
-- Type hints where practical
+- Use **React functional components** with hooks
+- Use **useFrame** for game loop updates (avoid setInterval)
+- Prefer **instanced rendering** for repeated objects (Grass, Trees)
+- Use **TypeScript strict mode** for type safety
+- Follow the **Strata API** for procedural generation (fbm, noise3D)
+- Use **Material-UI** for all 2D UI overlays
 
 ## 🚫 Don't Do This
 
-- Don't create new entry points (no `main_desktop.py`, etc.)
-- Don't use synchronous pygame patterns
-- Don't hardcode map layouts
-- Don't add dependencies without checking pygbag compatibility
+- **Don't use Math.random()** for world generation; use the `SeededRandom` class
+- **Don't use Python** or pygbag; the project has been fully migrated to TypeScript
+- **Don't add heavy dependencies** that impact web load times
+- **Don't bypass the Zustand store** for global game state

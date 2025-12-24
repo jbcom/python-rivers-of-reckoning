@@ -9,7 +9,7 @@
  */
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Stats } from '@react-three/drei'
+import { OrbitControls, Stats, Loader } from '@react-three/drei'
 import { Suspense, useMemo, useRef, useCallback } from 'react'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import * as THREE from 'three'
@@ -448,6 +448,14 @@ export default function App() {
           </Canvas>
         </div>
       )}
+
+      {/* Loading indicator for all assets */}
+      <Loader 
+        containerStyles={{ background: '#121212' }}
+        innerStyles={{ width: '300px', height: '10px' }}
+        barStyles={{ background: '#4CAF50' }}
+        dataInterpolation={(p) => `Loading World: ${p.toFixed(0)}%`}
+      />
     </ThemeProvider>
   )
 }
