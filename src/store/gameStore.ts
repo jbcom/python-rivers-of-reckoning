@@ -151,17 +151,26 @@ export const useGameStore = create<GameStore>()(
       const distance = Math.sqrt(dx * dx + dy * dy + dz * dz)
       if (distance < 0.01) return // Threshold for minimum movement
       
-      set((state) => ({
-        playerPosition: {
-          x: state.playerPosition.x + dx,
-          y: state.playerPosition.y + dy,
-          z: state.playerPosition.z + dz,
-        },
-        worldState: {
-          ...state.worldState,
-          distanceTraveled: state.worldState.distanceTraveled + distance,
-        },
-      }))
+      set((state) => {
+        const newX = state.playerPosition.x + dx
+        const newZ = state.playerPosition.z + dz
+        
+        // Clamp to world bounds
+        const clampedX = Math.max(-PLAYER.WORLD_BOUNDS, Math.min(PLAYER.WORLD_BOUNDS, newX))
+        const clampedZ = Math.max(-PLAYER.WORLD_BOUNDS, Math.min(PLAYER.WORLD_BOUNDS, newZ))
+        
+        return {
+          playerPosition: {
+            x: clampedX,
+            y: state.playerPosition.y + dy,
+            z: clampedZ,
+          },
+          worldState: {
+            ...state.worldState,
+            distanceTraveled: state.worldState.distanceTraveled + distance,
+          },
+        }
+      })
     },
 
     damagePlayer: (amount) =>
