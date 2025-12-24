@@ -15,6 +15,7 @@ interface DamageIndicator {
   position: THREE.Vector3
   damage: number
   time: number
+  type: 'damage' | 'hit'
 }
 
 interface CombatSystemProps {
@@ -44,7 +45,7 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
     }
   }, [])
 
-  const { playerStats } = useGameStore()
+  const { playerStats, settings } = useGameStore()
 
   // Calculate attack damage
   const getAttackDamage = useCallback(() => {
@@ -76,10 +77,33 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
       ),
       damage,
       time: 0,
+      type: 'damage'
     }
 
     setIndicators((prev) => [...prev, newIndicator])
-  }, [playerPosition, getAttackDamage])
+
+    // Add hit particles if enabled
+    if (settings.features.particles) {
+      for (let i = 0; i < 5; i++) {
+        const pOffsetX = (visualRngRef.current.next() - 0.5) * 1
+        const pOffsetY = (visualRngRef.current.next() - 0.5) * 1
+        const pOffsetZ = (visualRngRef.current.next() - 0.5) * 1
+        
+        const particle: DamageIndicator = {
+          id: idCounterRef.current++,
+          position: new THREE.Vector3(
+            playerPosition.x + pOffsetX,
+            playerPosition.y + 1 + pOffsetY,
+            playerPosition.z + pOffsetZ
+          ),
+          damage: 0,
+          time: 0,
+          type: 'hit'
+        }
+        setIndicators((prev) => [...prev, particle])
+      }
+    }
+  }, [playerPosition, getAttackDamage, settings.features.particles])
 
   // Attack input
   useEffect(() => {
@@ -140,23 +164,37 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
         </mesh>
       )}
 
-      {/* Damage indicators */}
+      {/* Damage indicators and hit particles */}
       {indicators.map((ind) => (
-        <sprite
-          key={ind.id}
-          position={[
-            ind.position.x,
-            ind.position.y + ind.time * 2, // Float upward
-            ind.position.z,
-          ]}
-          scale={[1 - ind.time * 0.5, 1 - ind.time * 0.5, 1]}
-        >
-          <spriteMaterial
-            color="#FFD700"
-            transparent
-            opacity={1 - ind.time}
-          />
-        </sprite>
+        ind.type === 'damage' ? (
+          <sprite
+            key={ind.id}
+            position={[
+              ind.position.x,
+              ind.position.y + ind.time * 2, // Float upward
+              ind.position.z,
+            ]}
+            scale={[1 - ind.time * 0.5, 1 - ind.time * 0.5, 1]}
+          >
+            <spriteMaterial
+              color="#FFD700"
+              transparent
+              opacity={1 - ind.time}
+            />
+          </sprite>
+        ) : (
+          <mesh
+            key={ind.id}
+            position={[
+              ind.position.x,
+              ind.position.y + ind.time * 1,
+              ind.position.z,
+            ]}
+          >
+            <sphereGeometry args={[0.05, 8, 8]} />
+            <meshBasicMaterial color="#f44336" transparent opacity={1 - ind.time} />
+          </mesh>
+        )
       ))}
     </group>
   )

@@ -209,9 +209,17 @@ export interface EnemyState {
 // GAME STATE
 // ============================================================================
 
+export enum DifficultyLevel {
+  EASY = 'easy',
+  NORMAL = 'normal',
+  HARD = 'hard',
+  LEGENDARY = 'legendary',
+}
+
 export interface WorldState {
   currentBiome: BiomeType
   difficulty: number
+  difficultyLevel: DifficultyLevel
   enemiesDefeated: number
   bossesDefeated: number
   distanceTraveled: number
@@ -219,3 +227,38 @@ export interface WorldState {
 }
 
 export type GameState = 'title' | 'playing' | 'paused' | 'gameover' | 'boss'
+
+// ============================================================================
+// QUEST SYSTEM
+// ============================================================================
+
+export enum QuestType {
+  DEFEAT_ENEMIES = 'defeat_enemies',
+  TRAVEL_DISTANCE = 'travel_distance',
+  COLLECT_GOLD = 'collect_gold',
+}
+
+export interface Quest {
+  id: string
+  type: QuestType
+  description: string
+  targetAmount: number
+  currentAmount: number
+  rewardGold: number
+  rewardExp: number
+  isCompleted: boolean
+}
+
+// ============================================================================
+// SETTINGS
+// ============================================================================
+
+export interface GameSettings {
+  features: {
+    weather: boolean
+    randomEvents: boolean
+    quests: boolean
+    particles: boolean
+    sound: boolean
+  }
+}

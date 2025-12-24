@@ -85,6 +85,13 @@ export const WEATHER = {
 // WORLD CONSTANTS
 // =============================================================================
 
+export const DIFFICULTY = {
+  [ 'easy' ]: { damageMult: 0.5, healthMult: 0.5, goldMult: 0.8, xpMult: 0.8 },
+  [ 'normal' ]: { damageMult: 1.0, healthMult: 1.0, goldMult: 1.0, xpMult: 1.0 },
+  [ 'hard' ]: { damageMult: 1.5, healthMult: 1.5, goldMult: 1.2, xpMult: 1.2 },
+  [ 'legendary' ]: { damageMult: 2.5, healthMult: 2.5, goldMult: 2.0, xpMult: 2.0 },
+} as const
+
 export const WORLD = {
   // Terrain
   TERRAIN_SIZE: 200,

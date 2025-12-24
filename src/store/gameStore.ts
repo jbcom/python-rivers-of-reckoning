@@ -4,7 +4,7 @@
  */
 
 import { create } from 'zustand'
-import { subscribeWithSelector } from 'zustand/middleware'
+import { subscribeWithSelector, persist } from 'zustand/middleware'
 import {
   BiomeType,
   TimePhase,
@@ -17,6 +17,10 @@ import {
   TimeOfDay,
   Weather,
   WorldState,
+  Quest,
+  QuestType,
+  GameSettings,
+  DifficultyLevel,
 } from '../types/game'
 import { PLAYER, TIME, WEATHER, LEVELING } from '../constants/game'
 
@@ -24,6 +28,7 @@ interface GameStore {
   // Game state
   gameState: GameState
   setGameState: (state: GameState) => void
+  settings: GameSettings
 
   // Player
   playerPosition: Position
@@ -48,8 +53,16 @@ interface GameStore {
   // World state
   worldState: WorldState
   updateBiome: (biome: BiomeType) => void
+  setDifficultyLevel: (level: DifficultyLevel) => void
+  toggleFeature: (feature: keyof GameSettings['features']) => void
   incrementEnemiesDefeated: () => void
   incrementBossesDefeated: () => void
+
+  // Quests
+  activeQuests: Quest[]
+  addQuest: (quest: Quest) => void
+  updateQuestProgress: (type: QuestType, amount: number) => void
+  completeQuest: (id: string) => void
 
   // Game actions
   startGame: (seed?: number) => void
@@ -119,10 +132,32 @@ const getRandomWeather = (seed: number): WeatherType => {
 }
 
 export const useGameStore = create<GameStore>()(
-  subscribeWithSelector((set, get) => ({
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
     // Initial game state
     gameState: 'title',
     setGameState: (state) => set({ gameState: state }),
+
+    settings: {
+      features: {
+        weather: true,
+        randomEvents: true,
+        quests: true,
+        particles: true,
+        sound: true,
+      }
+    },
+
+    toggleFeature: (feature) => set((state) => ({
+      settings: {
+        ...state.settings,
+        features: {
+          ...state.settings.features,
+          [feature]: !state.settings.features[feature]
+        }
+      }
+    })),
 
     // Player initial state (using constants)
     playerPosition: { x: 0, y: 0, z: 0 },
@@ -169,6 +204,13 @@ export const useGameStore = create<GameStore>()(
             ...state.worldState,
             distanceTraveled: state.worldState.distanceTraveled + distance,
           },
+          activeQuests: state.activeQuests.map((q) => {
+            if (q.type === QuestType.TRAVEL_DISTANCE && !q.isCompleted) {
+              const newAmount = q.currentAmount + distance
+              return { ...q, currentAmount: newAmount, isCompleted: newAmount >= q.targetAmount }
+            }
+            return q
+          })
         }
       })
     },
@@ -202,6 +244,13 @@ export const useGameStore = create<GameStore>()(
           gold: state.playerStats.gold + amount,
           score: state.playerStats.score + amount,
         },
+        activeQuests: state.activeQuests.map((q) => {
+          if (q.type === QuestType.COLLECT_GOLD && !q.isCompleted) {
+            const newAmount = q.currentAmount + amount
+            return { ...q, currentAmount: newAmount, isCompleted: newAmount >= q.targetAmount }
+          }
+          return q
+        })
       })),
 
     addExperience: (amount) =>
@@ -322,6 +371,7 @@ export const useGameStore = create<GameStore>()(
     worldState: {
       currentBiome: BiomeType.GRASSLAND,
       difficulty: 1.0,
+      difficultyLevel: DifficultyLevel.NORMAL,
       enemiesDefeated: 0,
       bossesDefeated: 0,
       distanceTraveled: 0,
@@ -331,6 +381,11 @@ export const useGameStore = create<GameStore>()(
     updateBiome: (biome) =>
       set((state) => ({
         worldState: { ...state.worldState, currentBiome: biome },
+      })),
+
+    setDifficultyLevel: (level) =>
+      set((state) => ({
+        worldState: { ...state.worldState, difficultyLevel: level },
       })),
 
     incrementEnemiesDefeated: () =>
@@ -343,6 +398,13 @@ export const useGameStore = create<GameStore>()(
           ...state.playerStats,
           score: state.playerStats.score + 10,
         },
+        activeQuests: state.activeQuests.map((q) => {
+          if (q.type === QuestType.DEFEAT_ENEMIES && !q.isCompleted) {
+            const newAmount = q.currentAmount + 1
+            return { ...q, currentAmount: newAmount, isCompleted: newAmount >= q.targetAmount }
+          }
+          return q
+        })
       })),
 
     incrementBossesDefeated: () =>
@@ -356,6 +418,40 @@ export const useGameStore = create<GameStore>()(
           score: state.playerStats.score + 100,
         },
       })),
+
+    // Quest system
+    activeQuests: [],
+    addQuest: (quest) => set((state) => ({
+      activeQuests: [...state.activeQuests, quest]
+    })),
+
+    updateQuestProgress: (type, amount) => set((state) => ({
+      activeQuests: state.activeQuests.map((q) => {
+        if (q.type === type && !q.isCompleted) {
+          const newAmount = q.currentAmount + amount
+          const isCompleted = newAmount >= q.targetAmount
+          if (isCompleted && !q.isCompleted) {
+            // Self-trigger completion if we were to do it here, 
+            // but better to let a system handle the reward to avoid nested sets
+          }
+          return { ...q, currentAmount: newAmount, isCompleted }
+        }
+        return q
+      })
+    })),
+
+    completeQuest: (id) => set((state) => {
+      const quest = state.activeQuests.find(q => q.id === id)
+      if (quest && quest.isCompleted) {
+        // Apply rewards
+        get().addGold(quest.rewardGold)
+        get().addExperience(quest.rewardExp)
+        return {
+          activeQuests: state.activeQuests.filter(q => q.id !== id)
+        }
+      }
+      return {}
+    }),
 
     // Game actions - reset to initial state using constants
     startGame: (seed) =>
@@ -397,6 +493,7 @@ export const useGameStore = create<GameStore>()(
         worldState: {
           currentBiome: BiomeType.GRASSLAND,
           difficulty: 1.0,
+          difficultyLevel: DifficultyLevel.NORMAL,
           enemiesDefeated: 0,
           bossesDefeated: 0,
           distanceTraveled: 0,
@@ -408,5 +505,19 @@ export const useGameStore = create<GameStore>()(
     resumeGame: () => set({ gameState: 'playing' }),
     endGame: () => set({ gameState: 'gameover' }),
     resetGame: () => set({ gameState: 'title' }),
-  }))
+  }),
+  {
+    name: 'rivers-of-reckoning-save',
+    partialize: (state) => ({
+      playerPosition: state.playerPosition,
+      playerHealth: state.playerHealth,
+      playerStamina: state.playerStamina,
+      playerStats: state.playerStats,
+          timeOfDay: state.timeOfDay,
+          weather: state.weather,
+          worldState: state.worldState,
+          activeQuests: state.activeQuests,
+        }),
+      }
 )
+))

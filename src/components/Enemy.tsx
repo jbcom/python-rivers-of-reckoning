@@ -3,19 +3,22 @@
  * Ported from Python enemy.py and procedural_enemies.py
  */
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { ENEMY, PLAYER } from '../constants/game'
+import { ENEMY, PLAYER, DIFFICULTY } from '../constants/game'
 import { combatEvents } from '../events/combatEvents'
+import { useGameStore } from '../store/gameStore'
 
 // Enemy types with different stats (matches GAME_IDENTITY.md)
 const ENEMY_TYPES = [
-  { name: 'Slime', color: '#4CAF50', speed: 2, damage: 5, health: 20, xp: 10 },
-  { name: 'Goblin', color: '#8BC34A', speed: 4, damage: 8, health: 30, xp: 20 },
-  { name: 'Orc', color: '#795548', speed: 3, damage: 15, health: 50, xp: 35 },
-  { name: 'Wraith', color: '#9C27B0', speed: 5, damage: 12, health: 25, xp: 30 },
-  { name: 'Wolf', color: '#607D8B', speed: 6, damage: 10, health: 35, xp: 25 },
+  { name: 'Slime', color: '#4CAF50', speed: 2, damage: 5, health: 20, xp: 10, isBoss: false },
+  { name: 'Goblin', color: '#8BC34A', speed: 4, damage: 8, health: 30, xp: 20, isBoss: false },
+  { name: 'Orc', color: '#795548', speed: 3, damage: 15, health: 50, xp: 35, isBoss: false },
+  { name: 'Wraith', color: '#9C27B0', speed: 5, damage: 12, health: 25, xp: 30, isBoss: false },
+  { name: 'Wolf', color: '#607D8B', speed: 6, damage: 10, health: 35, xp: 25, isBoss: false },
+  { name: 'Dragon', color: '#FF4500', speed: 2, damage: 40, health: 250, xp: 500, isBoss: true },
+  { name: 'Gorgon', color: '#2E8B57', speed: 3, damage: 30, health: 200, xp: 400, isBoss: true },
 ] as const
 
 // Seeded random for deterministic spawning
@@ -62,24 +65,30 @@ export function EnemySystem({
   onEnemyDefeated,
   onPlayerDamage,
 }: EnemySystemProps) {
+  const { worldState, incrementBossesDefeated } = useGameStore()
+  const difficulty = DIFFICULTY[worldState.difficultyLevel]
+
   const [enemies, setEnemies] = useState<EnemyData[]>(() => {
     const rng = new SeededRandom(seed)
     const initialEnemies: EnemyData[] = []
     const count = ENEMY.MIN_SPAWN_COUNT + rng.nextInt(ENEMY.MAX_SPAWN_ADDITIONAL)
+    const normalEnemyTypes = ENEMY_TYPES.filter(t => !t.isBoss)
 
     for (let i = 0; i < count; i++) {
-      const type = ENEMY_TYPES[rng.nextInt(ENEMY_TYPES.length)]
+      const type = normalEnemyTypes[rng.nextInt(normalEnemyTypes.length)]
       const x = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
       const z = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
       const y = heightFunction(x, z) + 0.5
       const enemyRng = new SeededRandom(seed + i * 1000)
 
+      const health = type.health * difficulty.healthMult
+
       initialEnemies.push({
         id: i,
         type,
         position: new THREE.Vector3(x, Math.max(0.5, y), z),
-        health: type.health,
-        maxHealth: type.health,
+        health,
+        maxHealth: health,
         state: 'wandering',
         targetPosition: new THREE.Vector3(x, y, z),
         stateTimer: rng.next() * 5,
@@ -88,6 +97,41 @@ export function EnemySystem({
     }
     return initialEnemies
   })
+
+  const spawnBoss = useCallback(() => {
+    const bossTypes = ENEMY_TYPES.filter(t => t.isBoss)
+    const type = bossTypes[Math.floor(Math.random() * bossTypes.length)]
+    
+    const x = (Math.random() - 0.5) * ENEMY.SPAWN_AREA_SIZE * 0.5
+    const z = (Math.random() - 0.5) * ENEMY.SPAWN_AREA_SIZE * 0.5
+    const y = heightFunction(x, z) + 1.0
+    
+    const health = type.health * difficulty.healthMult
+
+    const newBoss: EnemyData = {
+      id: Date.now(),
+      type,
+      position: new THREE.Vector3(x, y, z),
+      health,
+      maxHealth: health,
+      state: 'chasing',
+      targetPosition: new THREE.Vector3(x, y, z),
+      stateTimer: 0,
+      rng: new SeededRandom(Date.now()),
+    }
+
+    setEnemies(prev => [...prev, newBoss])
+    console.log(`BOSS SPAWNED: ${type.name}!`)
+  }, [difficulty.healthMult, heightFunction])
+
+  // Spawn boss after 10 enemies defeated
+  useEffect(() => {
+    if (worldState.enemiesDefeated > 0 && worldState.enemiesDefeated % 10 === 0) {
+      // Defer to avoid cascading renders warning
+      const timer = setTimeout(() => spawnBoss(), 0)
+      return () => clearTimeout(timer)
+    }
+  }, [worldState.enemiesDefeated, spawnBoss])
   
   const enemiesRef = useRef<EnemyData[]>(enemies)
   const meshRefs = useRef<Map<number, THREE.Mesh>>(new Map())
@@ -115,8 +159,12 @@ export function EnemySystem({
           changed = true
           if (newHealth <= 0) {
             // Enemy defeated
-            const goldReward = Math.floor(enemy.type.xp / 2)
-            onEnemyDefeated(enemy.type.xp, goldReward)
+            const goldReward = Math.floor((enemy.type.xp / 2) * difficulty.goldMult)
+            onEnemyDefeated(enemy.type.xp * difficulty.xpMult, goldReward)
+            
+            if (enemy.type.isBoss) {
+              incrementBossesDefeated()
+            }
           }
           return { ...enemy, health: newHealth }
         }
@@ -129,7 +177,7 @@ export function EnemySystem({
     })
 
     return unsubscribe
-  }, [onEnemyDefeated])
+  }, [onEnemyDefeated, difficulty.goldMult, difficulty.xpMult, incrementBossesDefeated])
 
   // Enemy AI update
   useFrame((_, delta) => {
@@ -195,7 +243,7 @@ export function EnemySystem({
         const lastAttack = lastAttackRef.current.get(enemy.id) || 0
         const now = Date.now()
         if (now - lastAttack > ENEMY.ATTACK_COOLDOWN) {
-          onPlayerDamage(enemy.type.damage)
+          onPlayerDamage(enemy.type.damage * difficulty.damageMult)
           lastAttackRef.current.set(enemy.id, now)
         }
       }
@@ -229,6 +277,7 @@ export function EnemySystem({
               }}
               position={enemy.position}
               castShadow
+              scale={enemy.type.isBoss ? [2.5, 2.5, 2.5] : [1, 1, 1]}
             >
               <sphereGeometry args={[0.4, 16, 16]} />
               <meshStandardMaterial

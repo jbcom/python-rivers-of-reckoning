@@ -37,6 +37,8 @@ import {
 import { TitleScreen, GameHUD, PauseMenu, GameOverScreen, Player, EnemySystem, CombatSystem } from './components'
 import { useGameStore } from './store/gameStore'
 import { WeatherType } from './types/game'
+import { useRandomEvents } from './features/RandomEvents'
+import { useQuestSystem } from './features/QuestSystem'
 
 // =============================================================================
 // HEIGHT FUNCTION (shared for terrain, player, enemies)
@@ -273,11 +275,33 @@ function WeatherEffects({ weather, intensity }: { weather: WeatherType; intensit
 // =============================================================================
 
 function GameLoop() {
-  const { updateTime, updateWeather } = useGameStore()
+  const { updateTime, updateWeather, playerStats, addQuest, activeQuests, settings } = useGameStore()
+  const { triggerRandomEvent } = useRandomEvents()
+  const { checkQuests, generateQuest } = useQuestSystem()
+  const lastEventCheck = useRef(0)
+  const lastQuestCheck = useRef(0)
 
-  useFrame((_, deltaTime) => {
+  useFrame((state, deltaTime) => {
     updateTime(deltaTime)
     updateWeather(deltaTime)
+
+    // Check for random events every 10 seconds
+    if (settings.features.randomEvents && state.clock.elapsedTime - lastEventCheck.current > 10) {
+      triggerRandomEvent()
+      lastEventCheck.current = state.clock.elapsedTime
+    }
+
+    // Quest logic every 2 seconds
+    if (settings.features.quests && state.clock.elapsedTime - lastQuestCheck.current > 2) {
+      checkQuests()
+      
+      // If no active quests, generate one
+      if (activeQuests.length === 0) {
+        addQuest(generateQuest(playerStats.level))
+      }
+      
+      lastQuestCheck.current = state.clock.elapsedTime
+    }
   })
 
   return null
@@ -297,6 +321,7 @@ function Scene() {
     addExperience,
     addGold,
     incrementEnemiesDefeated,
+    settings,
   } = useGameStore()
 
   // Callbacks for enemy system
@@ -360,7 +385,9 @@ function Scene() {
       />
 
       {/* Weather effects */}
-      <WeatherEffects weather={weather.current} intensity={weather.intensity} />
+      {settings.features.weather && (
+        <WeatherEffects weather={weather.current} intensity={weather.intensity} />
+      )}
 
       {/* Terrain */}
       <ProceduralTerrain size={200} segments={256} seed={worldState.seed} />
