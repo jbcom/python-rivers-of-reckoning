@@ -3,7 +3,7 @@
  * Ported from Python enemy.py and procedural_enemies.py
  */
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { ENEMY, PLAYER } from '../constants/game'
@@ -62,16 +62,9 @@ export function EnemySystem({
   onEnemyDefeated,
   onPlayerDamage,
 }: EnemySystemProps) {
-  const enemiesRef = useRef<EnemyData[]>([])
-  const meshRefs = useRef<Map<number, THREE.Mesh>>(new Map())
-  const lastAttackRef = useRef<Map<number, number>>(new Map())
-
-  // Initialize enemies with seeded randomness
-  useEffect(() => {
+  const [enemies, setEnemies] = useState<EnemyData[]>(() => {
     const rng = new SeededRandom(seed)
-    const enemies: EnemyData[] = []
-
-    // Spawn count based on seed
+    const initialEnemies: EnemyData[] = []
     const count = ENEMY.MIN_SPAWN_COUNT + rng.nextInt(ENEMY.MAX_SPAWN_ADDITIONAL)
 
     for (let i = 0; i < count; i++) {
@@ -79,11 +72,9 @@ export function EnemySystem({
       const x = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
       const z = (rng.next() - 0.5) * ENEMY.SPAWN_AREA_SIZE
       const y = heightFunction(x, z) + 0.5
-
-      // Each enemy gets its own seeded RNG for deterministic behavior
       const enemyRng = new SeededRandom(seed + i * 1000)
 
-      enemies.push({
+      initialEnemies.push({
         id: i,
         type,
         position: new THREE.Vector3(x, Math.max(0.5, y), z),
@@ -95,29 +86,46 @@ export function EnemySystem({
         rng: enemyRng,
       })
     }
+    return initialEnemies
+  })
+  
+  const enemiesRef = useRef<EnemyData[]>(enemies)
+  const meshRefs = useRef<Map<number, THREE.Mesh>>(new Map())
+  const healthBarRefs = useRef<Map<number, THREE.Mesh>>(new Map())
+  const lastAttackRef = useRef<Map<number, number>>(new Map())
 
+  // Keep ref in sync with state for AI loop
+  useEffect(() => {
     enemiesRef.current = enemies
-  }, [seed, heightFunction])
+  }, [enemies])
 
   // Subscribe to attack events from combat system
   useEffect(() => {
     const unsubscribe = combatEvents.onPlayerAttack((attackPos, range, damage) => {
       const attackPosition = new THREE.Vector3(attackPos.x, attackPos.y, attackPos.z)
       
-      enemiesRef.current.forEach((enemy) => {
-        if (enemy.health <= 0) return
+      let changed = false
+      const updatedEnemies = enemiesRef.current.map((enemy) => {
+        if (enemy.health <= 0) return enemy
         
         const dist = enemy.position.distanceTo(attackPosition)
         if (dist <= range) {
           // Enemy in range - apply damage
-          enemy.health -= damage
-          if (enemy.health <= 0) {
+          const newHealth = enemy.health - damage
+          changed = true
+          if (newHealth <= 0) {
             // Enemy defeated
             const goldReward = Math.floor(enemy.type.xp / 2)
             onEnemyDefeated(enemy.type.xp, goldReward)
           }
+          return { ...enemy, health: newHealth }
         }
+        return enemy
       })
+      
+      if (changed) {
+        setEnemies(updatedEnemies)
+      }
     })
 
     return unsubscribe
@@ -131,6 +139,7 @@ export function EnemySystem({
       if (enemy.health <= 0) return
 
       const mesh = meshRefs.current.get(enemy.id)
+      const healthBar = healthBarRefs.current.get(enemy.id)
       if (!mesh) return
 
       const distToPlayer = enemy.position.distanceTo(playerPos)
@@ -191,20 +200,24 @@ export function EnemySystem({
         }
       }
 
-      // Update mesh
+      // Update mesh and health bar
       mesh.position.copy(enemy.position)
       if (moveDir.lengthSq() > 0) {
         mesh.rotation.y = Math.atan2(moveDir.x, moveDir.z)
+      }
+      
+      if (healthBar) {
+        healthBar.position.set(enemy.position.x, enemy.position.y + 0.8, enemy.position.z)
+        const healthPercent = Math.max(0, enemy.health / enemy.maxHealth)
+        healthBar.scale.x = healthPercent
       }
     })
   })
 
   return (
     <group>
-      {enemiesRef.current.map((enemy) => {
+      {enemies.map((enemy) => {
         if (enemy.health <= 0) return null
-
-        const healthPercent = enemy.health / enemy.maxHealth
 
         return (
           <group key={enemy.id}>
@@ -212,6 +225,7 @@ export function EnemySystem({
             <mesh
               ref={(ref) => {
                 if (ref) meshRefs.current.set(enemy.id, ref)
+                else meshRefs.current.delete(enemy.id)
               }}
               position={enemy.position}
               castShadow
@@ -226,12 +240,15 @@ export function EnemySystem({
 
             {/* Health bar */}
             <mesh
+              ref={(ref) => {
+                if (ref) healthBarRefs.current.set(enemy.id, ref)
+                else healthBarRefs.current.delete(enemy.id)
+              }}
               position={[enemy.position.x, enemy.position.y + 0.8, enemy.position.z]}
-              rotation={[0, 0, 0]}
             >
-              <planeGeometry args={[0.8 * healthPercent, 0.1]} />
+              <planeGeometry args={[0.8, 0.1]} />
               <meshBasicMaterial
-                color={healthPercent > 0.5 ? '#4CAF50' : healthPercent > 0.25 ? '#FF9800' : '#f44336'}
+                color={enemy.health / enemy.maxHealth > 0.5 ? '#4CAF50' : enemy.health / enemy.maxHealth > 0.25 ? '#FF9800' : '#f44336'}
               />
             </mesh>
           </group>

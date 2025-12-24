@@ -33,9 +33,16 @@ class VisualRandom {
 
 export function CombatSystem({ playerPosition }: CombatSystemProps) {
   const [indicators, setIndicators] = useState<DamageIndicator[]>([])
+  const [isAttacking, setIsAttacking] = useState(false)
   const attackCooldownRef = useRef(0)
   const idCounterRef = useRef(0)
-  const visualRngRef = useRef(new VisualRandom(Date.now()))
+  const visualRngRef = useRef<VisualRandom>(null!)
+
+  useEffect(() => {
+    if (!visualRngRef.current) {
+      visualRngRef.current = new VisualRandom(12345) // Fixed seed for visual effects
+    }
+  }, [])
 
   const { playerStats } = useGameStore()
 
@@ -46,6 +53,7 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
 
   // Perform attack - emit event to enemy system
   const performAttack = useCallback(() => {
+    setIsAttacking(true)
     const damage = getAttackDamage()
 
     // Emit attack event - enemy system will check for hits
@@ -105,6 +113,9 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
   useFrame((_, delta) => {
     if (attackCooldownRef.current > 0) {
       attackCooldownRef.current -= delta
+      if (attackCooldownRef.current <= 0) {
+        setIsAttacking(false)
+      }
     }
 
     // Update indicators - only update when there are indicators
@@ -119,7 +130,7 @@ export function CombatSystem({ playerPosition }: CombatSystemProps) {
   return (
     <group>
       {/* Attack range indicator when attacking */}
-      {attackCooldownRef.current > 0 && (
+      {isAttacking && (
         <mesh
           position={[playerPosition.x, 0.02, playerPosition.z]}
           rotation={[-Math.PI / 2, 0, 0]}

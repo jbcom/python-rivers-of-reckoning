@@ -197,7 +197,7 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     // Measure FPS
     const fps = await page.evaluate(async () => {
       let frameCount = 0
-      let lastTime = performance.now()
+      const lastTime = performance.now()
       
       return new Promise<number>((resolve) => {
         const measureFrame = () => {
