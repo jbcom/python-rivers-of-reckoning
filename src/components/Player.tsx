@@ -17,8 +17,12 @@ export function Player({ heightFunction }: PlayerProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const velocityRef = useRef(new THREE.Vector3())
   const keysRef = useRef<Set<string>>(new Set())
+  const joystickRef = useRef({ x: 0, y: 0 }) // Virtual joystick state
 
   const { playerPosition, movePlayer, playerHealth } = useGameStore()
+  
+  // Joystick dead zone constant
+  const JOYSTICK_DEAD_ZONE = 0.1
 
   // Keyboard input handling
   useEffect(() => {
@@ -29,12 +33,21 @@ export function Player({ heightFunction }: PlayerProps) {
       keysRef.current.delete(e.key.toLowerCase())
     }
 
+    const handleJoystick = (e: any) => {
+      if (e.detail) {
+        joystickRef.current.x = e.detail.x || 0
+        joystickRef.current.y = e.detail.y || 0
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('game:joystick', handleJoystick as EventListener)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('game:joystick', handleJoystick as EventListener)
     }
   }, [])
 
@@ -54,11 +67,20 @@ export function Player({ heightFunction }: PlayerProps) {
     if (keys.has('a') || keys.has('arrowleft')) moveX -= 1
     if (keys.has('d') || keys.has('arrowright')) moveX += 1
 
+    // Add joystick input with dead zone
+    const joyX = Math.abs(joystickRef.current.x) > JOYSTICK_DEAD_ZONE ? joystickRef.current.x : 0
+    const joyY = Math.abs(joystickRef.current.y) > JOYSTICK_DEAD_ZONE ? joystickRef.current.y : 0
+    
+    moveX += joyX
+    moveZ += joyY
+
     // Normalize diagonal movement
-    if (moveX !== 0 && moveZ !== 0) {
+    if (moveX !== 0 || moveZ !== 0) {
       const len = Math.sqrt(moveX * moveX + moveZ * moveZ)
-      moveX /= len
-      moveZ /= len
+      if (len > 1) { // Only normalize if combined input exceeds 1
+        moveX /= len
+        moveZ /= len
+      }
     }
 
     // Apply movement

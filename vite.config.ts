@@ -10,5 +10,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
-  }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    deps: {
+      inline: [/@jbcom\/strata/],
+    },
+  },
 })
