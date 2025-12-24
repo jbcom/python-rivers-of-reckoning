@@ -9,6 +9,18 @@ import { useGameStore } from '../store/gameStore'
 export function TitleScreen() {
   const { startGame } = useGameStore()
 
+  const handleStart = () => {
+    // Resume audio context for browser autoplay restrictions
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    if (AudioContextClass) {
+      const audioCtx = new AudioContextClass()
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume()
+      }
+    }
+    startGame()
+  }
+
   // Core features from GAME_IDENTITY.md design pillars
   const features = [
     'Infinite procedural worlds from seeds',
@@ -93,7 +105,7 @@ export function TitleScreen() {
           variant="contained"
           size="large"
           startIcon={<PlayArrow />}
-          onClick={() => startGame()}
+          onClick={handleStart}
           sx={{
             px: 6,
             py: 2,
