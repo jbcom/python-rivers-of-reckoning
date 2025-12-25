@@ -14,7 +14,7 @@ def get_free_port():
 def web_server():
     # Ensure build/web exists
     if not os.path.exists("build/web"):
-        subprocess.run(["python", "-m", "pygbag", "--build", "."], check=True)
+        subprocess.run(["python", "-m", "pygbag", "."], check=True)
     
     port = get_free_port()
     # Start a simple HTTP server in build/web

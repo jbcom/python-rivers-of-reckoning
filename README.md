@@ -50,7 +50,7 @@ python main.py
 Build the legend for the browser using `pygbag`:
 ```bash
 pip install pygbag
-python -m pygbag --build .
+python -m pygbag .
 ```
 
 ## 🌍 Procedural Saga Systems

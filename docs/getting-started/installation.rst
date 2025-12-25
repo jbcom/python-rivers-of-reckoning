@@ -73,7 +73,7 @@ To build the game for static hosting (e.g., GitHub Pages, Render, Netlify):
 
 .. code-block:: bash
 
-   python -m pygbag --build .
+   python -m pygbag .
 
 The build artifacts will be generated in the ``build/web`` directory.
 
@@ -88,7 +88,7 @@ The repository includes a ``render.yaml`` blueprint for easy deployment:
 
    .. code-block:: bash
 
-      pip install pygame-ce pygbag opensimplex esper && pip install -e . && python -m pygbag --build build/web .
+      pip install pygame-ce pygbag opensimplex esper && pip install -e . && python -m pygbag .
 
 3. Set the **Static Publish Path** to ``./build/web``.
 

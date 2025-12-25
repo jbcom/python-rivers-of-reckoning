@@ -23,9 +23,10 @@ jobs:
         env:
           LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
           TITLE: ${{ github.event.issue.title }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-          echo "title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
+          echo "number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
           
           # Determine project based on labels and title
           ADD_INTEGRATION=false
