@@ -1,94 +1,100 @@
+"""
+End-to-End tests for Rivers of Reckoning web build.
+
+Best practices followed:
+- Tests are isolated and independent
+- Uses proper Playwright fixtures
+- Tests user-visible behavior (canvas, keyboard input)
+- Avoids testing implementation details
+- Uses explicit waits with timeouts
+"""
 import pytest
-import subprocess
-import time
-import socket
-import os
 from playwright.sync_api import Page, expect
 
 
-def get_free_port():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        return s.getsockname()[1]
+@pytest.fixture(scope="session")
+def base_url():
+    """
+    Base URL for the web server.
+    In CI, this should point to the built pygbag output served via HTTP.
+    Locally, you can run: python -m http.server 8000 -d build/web
+    """
+    import os
+    return os.getenv("BASE_URL", "http://localhost:8000")
 
 
-@pytest.fixture(scope="module", autouse=True)
-def web_server():
-    # Ensure build/web exists
-    if not os.path.exists("build/web"):
-        subprocess.run(["python", "-m", "pygbag", "."], check=True)
+def test_game_loads(page: Page, base_url: str):
+    """Test that the game loads and renders the canvas."""
+    # Navigate to the game
+    page.goto(base_url, wait_until="domcontentloaded")
 
-    port = get_free_port()
-    # Start a simple HTTP server in build/web
-    process = subprocess.Popen(
-        ["python", "-m", "http.server", str(port)], cwd="build/web", stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+    # Verify page title
+    expect(page).to_have_title("Rivers of Reckoning", timeout=10000)
 
-    # Wait for server to be ready
-    url = f"http://localhost:{port}"
-    timeout = 10
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        try:
-            with socket.create_connection(("localhost", port), timeout=1):
-                break
-        except (socket.timeout, ConnectionRefusedError):
-            time.sleep(0.5)
-    else:
-        process.terminate()
-        raise RuntimeError("Failed to start web server")
-
-    yield url
-
-    process.terminate()
-    process.wait()
-
-
-def test_game_loads(page: Page, web_server: str):
-    # Go to the local server
-    page.goto(web_server)
-
-    # Check title
-    expect(page).to_have_title("Rivers of Reckoning")
-
-    # Wait for the canvas to be present
-    # pygbag's template usually has a canvas with id="canvas"
+    # Wait for canvas to be present (pygbag renders to canvas#canvas)
     canvas = page.locator("#canvas")
     expect(canvas).to_be_visible(timeout=30000)
 
-    # Give it more time for WASM to initialize
-    time.sleep(5)
-
-    # Optional: Take a screenshot
-    # page.screenshot(path="tests/e2e-screenshot.png")
-
-    # Check if we can find some text that pygbag might render if it's not just a canvas
-    # Actually, pygbag renders EVERYTHING to the canvas.
-    # We can check if the canvas size is correct (960x960 logical, but might be scaled)
+    # Verify canvas has valid dimensions
     box = canvas.bounding_box()
-    assert box is not None
-    assert box["width"] > 0
-    assert box["height"] > 0
+    assert box is not None, "Canvas bounding box should exist"
+    assert box["width"] > 0, "Canvas width should be positive"
+    assert box["height"] > 0, "Canvas height should be positive"
+
+    # Optional: Wait for WASM to fully initialize
+    # pygbag shows loading text before the game starts
+    page.wait_for_timeout(3000)
 
 
-def test_game_keyboard_input(page: Page, web_server: str):
-    page.goto(web_server)
+def test_game_keyboard_input(page: Page, base_url: str):
+    """Test that the game responds to keyboard input without crashing."""
+    # Navigate to the game
+    page.goto(base_url, wait_until="domcontentloaded")
 
     # Wait for canvas
     canvas = page.locator("#canvas")
     expect(canvas).to_be_visible(timeout=30000)
 
-    # Wait for game to start
-    time.sleep(5)
+    # Focus the canvas (required for keyboard events)
+    canvas.click()
 
-    # Press space to start (if on title screen)
+    # Wait for WASM to initialize
+    page.wait_for_timeout(3000)
+
+    # Simulate keyboard input (space to start, arrow to move)
     page.keyboard.press("Space")
-    time.sleep(1)
+    page.wait_for_timeout(500)
 
-    # Press ArrowRight to move
-    page.keyboard.down("ArrowRight")
-    time.sleep(0.5)
-    page.keyboard.up("ArrowRight")
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(500)
 
-    # If it didn't crash, we're good
-    assert page.is_closed() is False
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(500)
+
+    # Verify page is still responsive (not crashed)
+    assert page.is_closed() is False, "Page should not be closed"
+    expect(canvas).to_be_visible()
+
+
+def test_game_canvas_rendering(page: Page, base_url: str):
+    """Test that the canvas is actively rendering (not frozen)."""
+    page.goto(base_url, wait_until="domcontentloaded")
+
+    canvas = page.locator("#canvas")
+    expect(canvas).to_be_visible(timeout=30000)
+
+    # Take initial screenshot
+    page.wait_for_timeout(3000)
+    screenshot1 = canvas.screenshot()
+
+    # Interact with game
+    canvas.click()
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(1000)
+
+    # Take second screenshot
+    screenshot2 = canvas.screenshot()
+
+    # Screenshots should be different (game is rendering/updating)
+    # This is a basic smoke test - if frozen, screenshots would be identical
+    assert screenshot1 != screenshot2, "Canvas should be actively rendering"

@@ -10,7 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  # Unit and integration tests via tox
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,9 +40,69 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox tox-gh-actions tox-uv
     
-    - name: Run tox (automatically selects env via tox-gh-actions)
+    - name: Run tox (unit + integration tests)
       run: tox
     
     - name: Run linter
       if: matrix.python-version == '3.10'
       run: tox -e lint
+
+  # End-to-end tests with Playwright (separate job)
+  e2e:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+      with:
+        python-version: "3.10"
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      with:
+        version: "latest"
+    
+    - name: Install dependencies with web extras
+      run: |
+        uv sync --extra web --extra dev
+    
+    - name: Build web version with pygbag
+      run: |
+        uv run python -m pygbag --build .
+        test -f build/web/index.html || (echo "Build failed" && exit 1)
+    
+    - name: Install Playwright browsers
+      run: |
+        uv run playwright install --with-deps chromium
+    
+    - name: Start HTTP server and run E2E tests
+      run: |
+        # Start server in background
+        cd build/web && python -m http.server 8000 &
+        SERVER_PID=$!
+        
+        # Wait for server to be ready
+        sleep 3
+        
+        # Run E2E tests
+        cd ../..
+        BASE_URL=http://localhost:8000 uv run pytest tests/test_e2e.py -v --tb=short
+        
+        # Cleanup
+        kill $SERVER_PID || true
+    
+    - name: Upload Playwright artifacts on failure
+      if: failure()
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      with:
+        name: playwright-report
+        path: test-results/
+        retention-days: 7
