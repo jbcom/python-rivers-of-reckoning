@@ -56,6 +56,8 @@ interface GameStore {
   setJoystickInput: (input: { x: number; y: number }) => void
   lookInput: { x: number; y: number }
   setLookInput: (input: { x: number; y: number }) => void
+  isTouchDevice: boolean
+  setIsTouchDevice: (isTouch: boolean) => void
 
   // Game actions
   startGame: (seed?: number) => void
@@ -368,6 +370,8 @@ export const useGameStore = create<GameStore>()(
     setJoystickInput: (input) => set({ joystickInput: input }),
     lookInput: { x: 0, y: 0 },
     setLookInput: (input) => set({ lookInput: input }),
+    isTouchDevice: false,
+    setIsTouchDevice: (isTouch) => set({ isTouchDevice: isTouch }),
 
     // Game actions - reset to initial state using constants
     startGame: (seed) =>

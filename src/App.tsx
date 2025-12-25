@@ -10,6 +10,7 @@
 
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Stats, Loader } from '@react-three/drei'
+import { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import { Suspense, useMemo, useRef, useCallback } from 'react'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import * as THREE from 'three'
@@ -287,15 +288,18 @@ function GameLoop() {
 // CAMERA ROTATOR (for look joystick)
 // =============================================================================
 
-function CameraRotator({ orbitControlsRef }: { orbitControlsRef: React.RefObject<any> }) {
+function CameraRotator({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
   const { lookInput } = useGameStore()
   
   useFrame(() => {
     if (orbitControlsRef.current && (lookInput.x !== 0 || lookInput.y !== 0)) {
       const sensitivity = 2.0 // Adjust for taste
-      orbitControlsRef.current.rotateLeft(lookInput.x * sensitivity * 0.01)
-      orbitControlsRef.current.rotateUp(lookInput.y * sensitivity * 0.01)
-      orbitControlsRef.current.update()
+      // Fixed inverted horizontal axis: rotateLeft(-lookInput.x) instead of rotateLeft(lookInput.x)
+      // Use any cast if types are strictly problematic, but rotateLeft exists on OrbitControls
+      const controls = orbitControlsRef.current as any
+      controls.rotateLeft(-lookInput.x * sensitivity * 0.01)
+      controls.rotateUp(lookInput.y * sensitivity * 0.01)
+      controls.update()
     }
   })
   
@@ -318,7 +322,7 @@ function Scene() {
     incrementEnemiesDefeated,
   } = useGameStore()
 
-  const orbitControlsRef = useRef<any>(null)
+  const orbitControlsRef = useRef<OrbitControlsImpl>(null)
 
   // Callbacks for enemy system
   const handleEnemyDefeated = (xp: number, gold: number) => {
@@ -453,7 +457,7 @@ export default function App() {
       
       {/* Main Game */}
       {(gameState === 'playing' || gameState === 'paused') && (
-        <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+        <div style={{ width: '100vw', height: '100vh', position: 'relative', touchAction: 'none' }}>
           {/* HUD Overlay */}
           <GameHUD />
           

@@ -9,6 +9,10 @@ interface VirtualJoystickProps {
   type?: 'move' | 'look'
 }
 
+/**
+ * VirtualJoystick component with haptic feedback and multi-touch support.
+ * Uses nipplejs for joystick logic and Zustand for state management.
+ */
 export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
   size = 120,
   position = { bottom: '40px', left: '40px' },
@@ -17,34 +21,55 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const managerRef = useRef<nipplejs.JoystickManager | null>(null)
-  const { setJoystickInput, setLookInput } = useGameStore()
-  const [isVisible, setIsVisible] = useState(() => {
-    return typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  })
+  const { setJoystickInput, setLookInput, isTouchDevice, setIsTouchDevice } = useGameStore()
+  
+  // Local visibility state to handle transitions smoothly
+  const [shouldRender, setShouldRender] = useState(isTouchDevice)
 
-  // Detect touch support and keyboard usage
+  // Use refs for the store setters to ensure the nipplejs callbacks are stable
+  // and don't trigger re-creation of the joystick manager unnecessarily.
+  const setInputRef = useRef(type === 'move' ? setJoystickInput : setLookInput)
+  
   useEffect(() => {
-    const handleKeyDown = () => {
-      // If keyboard is detected, we could hide the joystick
-      // but only if we're not currently using it
-      setIsVisible(false)
+    setInputRef.current = type === 'move' ? setJoystickInput : setLookInput
+  }, [type, setJoystickInput, setLookInput])
+
+  // Update local shouldRender when store isTouchDevice changes
+  useEffect(() => {
+    setShouldRender(isTouchDevice)
+  }, [isTouchDevice])
+
+  // Detect touch support and keyboard usage dynamically
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // List of movement keys that suggest keyboard use
+      const movementKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']
+      if (movementKeys.includes(e.key.toLowerCase())) {
+        setIsTouchDevice(false)
+      }
     }
 
     const handleTouchStart = () => {
-      setIsVisible(true)
+      setIsTouchDevice(true)
+    }
+
+    // Initial check
+    if (typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+      setIsTouchDevice(true)
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('touchstart', handleTouchStart)
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('touchstart', handleTouchStart)
     }
-  }, [])
+  }, [setIsTouchDevice])
 
+  // Initialize and manage nipplejs instance
   useEffect(() => {
-    if (!containerRef.current || !isVisible) {
+    if (!containerRef.current || !shouldRender) {
       if (managerRef.current) {
         managerRef.current.destroy()
         managerRef.current = null
@@ -52,6 +77,7 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
       return
     }
 
+    // mode: 'static' is better for production as it doesn't jump around
     const manager = nipplejs.create({
       zone: containerRef.current,
       mode: 'static',
@@ -66,32 +92,23 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
 
     manager.on('move', (_, data) => {
       if (data.vector) {
-        if (type === 'move') {
-          setJoystickInput({
-            x: data.vector.x,
-            y: -data.vector.y, // Inverse Y for moveZ
-          })
-        } else {
-          setLookInput({
-            x: data.vector.x,
-            y: data.vector.y,
-          })
-        }
+        setInputRef.current({
+          x: data.vector.x,
+          y: type === 'move' ? -data.vector.y : data.vector.y, // Inverse Y only for moveZ
+        })
       }
     })
 
     manager.on('start', () => {
+      // Haptic feedback on start
       if ('vibrate' in navigator) {
-        navigator.vibrate(10)
+        navigator.vibrate(15)
       }
     })
 
     manager.on('end', () => {
-      if (type === 'move') {
-        setJoystickInput({ x: 0, y: 0 })
-      } else {
-        setLookInput({ x: 0, y: 0 })
-      }
+      setInputRef.current({ x: 0, y: 0 })
+      // Haptic feedback on end
       if ('vibrate' in navigator) {
         navigator.vibrate(5)
       }
@@ -99,14 +116,18 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
 
     return () => {
       manager.destroy()
+      managerRef.current = null
+      // Ensure we clear input on unmount
+      setInputRef.current({ x: 0, y: 0 })
     }
-  }, [isVisible, setJoystickInput, setLookInput, size, color, type])
+  }, [shouldRender, color, size, type])
 
-  if (!isVisible) return null
+  if (!shouldRender) return null
 
   return (
     <div
       ref={containerRef}
+      className={`virtual-joystick-${type}`}
       style={{
         position: 'fixed',
         bottom: position.bottom,
@@ -117,6 +138,7 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
         zIndex: 1000,
         touchAction: 'none',
         pointerEvents: 'auto',
+        transition: 'opacity 0.3s ease-in-out',
       }}
     />
   )

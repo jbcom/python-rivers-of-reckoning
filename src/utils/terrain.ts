@@ -14,7 +14,7 @@ export function getTerrainHeight(x: number, z: number): number {
 /**
  * Validates if the generated map data is within reasonable bounds.
  */
-export function validateMapBounds(size: number, seed: number): boolean {
+export function validateMapBounds(size: number, _seed: number): boolean {
   // Sample some points on the map
   const samples = 10
   const step = size / samples
