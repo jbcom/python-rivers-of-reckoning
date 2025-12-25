@@ -7,7 +7,6 @@ class AudioManager {
   private ctx: AudioContext | null = null
   private musicBuffer: AudioBuffer | null = null
   private musicSource: AudioBufferSourceNode | null = null
-  private isEnabled: boolean = false
 
   constructor() {
     // Audio context is initialized on first user interaction
@@ -18,7 +17,6 @@ class AudioManager {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
     if (AudioContextClass) {
       this.ctx = new AudioContextClass()
-      this.isEnabled = true
     }
   }
 
@@ -85,8 +83,8 @@ class AudioManager {
       this.musicSource.loop = true
       this.musicSource.connect(this.ctx.destination)
       this.musicSource.start()
-    } catch (e) {
-      console.warn('Music playback failed, using synth fallback', e)
+    } catch (_e) {
+      console.warn('Music playback failed, using synth fallback', _e)
       // No synth fallback for music yet
     }
   }
@@ -95,7 +93,7 @@ class AudioManager {
     if (this.musicSource) {
       try {
         this.musicSource.stop()
-      } catch (e) {
+      } catch (_e) {
         // Already stopped or not started
       }
       this.musicSource.disconnect()

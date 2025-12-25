@@ -162,7 +162,9 @@ function Vegetation({ areaSize }: { areaSize: number }) {
   const treeTexture = useTexture('/assets/images/tree.png')
   
   // Configure textures
+  // eslint-disable-next-line react-hooks/immutability
   grassTexture.magFilter = grassTexture.minFilter = THREE.NearestFilter
+  // eslint-disable-next-line react-hooks/immutability
   treeTexture.magFilter = treeTexture.minFilter = THREE.NearestFilter
 
   // Height function for placing vegetation
@@ -184,13 +186,11 @@ function Vegetation({ areaSize }: { areaSize: number }) {
         heightFunc={heightFunc}
         height={0.3}
         color="#4a7a4a"
-        map={grassTexture}
       />
       <TreeInstances
         count={150}
         areaSize={areaSize}
         heightFunc={heightFunc}
-        map={treeTexture}
       />
       <RockInstances
         count={80}

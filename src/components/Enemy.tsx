@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 /**
  * Enemy System - Procedural enemy generation and AI
  * Ported from Python enemy.py and procedural_enemies.py
@@ -6,12 +7,9 @@
 import { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
-import * as THREE from 'this-is-not-three-but-three-is-fine'
-import * as THREE_REAL from 'three'
+import * as THREE from 'three'
 import { ENEMY, PLAYER } from '../constants/game'
 import { combatEvents } from '../events/combatEvents'
-
-const THREE = THREE_REAL
 
 // Enemy types with different stats (matches GAME_IDENTITY.md)
 const ENEMY_TYPES = [
@@ -101,7 +99,9 @@ export function EnemySystem({
 
   // Load enemy texture
   const enemyTexture = useTexture('/assets/images/enemy.png')
+  // eslint-disable-next-line react-hooks/immutability
   enemyTexture.magFilter = THREE.NearestFilter
+  // eslint-disable-next-line react-hooks/immutability
   enemyTexture.minFilter = THREE.NearestFilter
 
   // Keep ref in sync with state for AI loop

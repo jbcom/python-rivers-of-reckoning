@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 /**
  * Player Component - 3D player character with WASD movement
  * Ported from Python player.py
@@ -76,7 +77,7 @@ export function Player({ heightFunction }: PlayerProps) {
   }, [])
 
   // Movement and physics
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!meshRef.current || !spriteRef.current) return
 
     const keys = keysRef.current
@@ -115,6 +116,7 @@ export function Player({ heightFunction }: PlayerProps) {
     if (isMoving) {
       animationTimerRef.current += delta * 10
       animationFrameRef.current = Math.floor(animationTimerRef.current) % 4
+      // eslint-disable-next-line react-hooks/immutability
       spriteTexture.offset.x = animationFrameRef.current / 4
 
       // Play move sound occasionally - Performance fix to avoid audio spam

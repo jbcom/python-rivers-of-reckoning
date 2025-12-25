@@ -37,7 +37,7 @@ const WeatherIcon = ({ weather }: { weather: WeatherType }) => {
 
 // Virtual Joystick for Mobile
 const VirtualJoystick = () => {
-  const [isActive, setIsActive] = useState(false)
+  const [, setIsActive] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
   

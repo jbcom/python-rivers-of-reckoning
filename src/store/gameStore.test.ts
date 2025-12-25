@@ -116,7 +116,6 @@ describe('GameStore', () => {
 
     it('should change weather when duration expires', () => {
       const { updateWeather } = useGameStore.getState()
-      const initialWeather = useGameStore.getState().weather.current
       
       // Force weather change by passing large dt
       updateWeather(10000)

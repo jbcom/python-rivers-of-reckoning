@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('@jbcom/strata', () => ({
-  fbm: (x: number, y: number, z: number, octaves?: number) => {
+  fbm: (x: number, _y: number, z: number, _octaves?: number) => {
     // Simple deterministic mock for fbm
     return Math.sin(x) * Math.cos(z) * 0.5 + 0.5
   }
