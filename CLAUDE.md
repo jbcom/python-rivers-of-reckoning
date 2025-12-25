@@ -6,11 +6,16 @@
 
 **Rivers of Reckoning** is a personal tribute turned into an atmospheric roguelike. While the TypeScript "Rivermarsh" focuses on literal geography, this Python standalone is the **Saga of Rivers**—a character-driven journey through a world that actively reacts to your progress.
 
+## 📜 The Genesis: From Curses to 2.5D
+
+**Rivers of Reckoning** evolved from a `curses` terminal project into this 2.5D Python saga. While TypeScript versions move into 3D space, this project remains committed to the **2.5D Perspective**—preserving the readability and logic-first approach of its origins.
+
 ### How we differ from "Rivermarsh" (TS):
-1.  **The Protagonist's Burden**: The game is about the character "Rivers" (named for the creator's stepson) and his struggle against the **Reckoning**.
-2.  **The Reckoning Meter**: A unique "destiny" mechanic. The world grows more hostile not just because of where you are, but because of who you are and how long you've survived.
-3.  **Fate's Pull**: What was once "Water Flow" is now **The Flow of Fate**—a physical force representing the world's attempt to steer Rivers off his path.
-4.  **Legendary Aesthetic**: High-contrast, moody colors (Deep Void, Reckoning Red, Sulfur) that feel like an old chronicle or a dark legend.
+1.  **The Protagonist's Burden**: The game is about the character "Rivers" and his struggle against the **Reckoning**.
+2.  **2.5D Spatial Logic**: We use grid-based depth rather than full 3D geometry. This keeps the code accessible for those learning game logic.
+3.  **The Reckoning Meter**: A unique "destiny" mechanic.
+4.  **Fate's Pull**: Physical force representing the world's attempt to steer Rivers off his path.
+5.  **Legendary Aesthetic**: High-contrast, moody colors.
 
 ### Unique Standalone Goals
 

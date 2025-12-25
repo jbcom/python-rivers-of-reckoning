@@ -176,8 +176,8 @@ class Game:
         )
 
         # Standalone Branding
-        self.engine.text(5, 240, "v0.5.0 Standalone", 5)
-        self.engine.text(180, 240, "Python Powered", 12)
+        self.engine.text(5, 240, "Genesis: Curses 1.0", 5)
+        self.engine.text(180, 240, "Python 2.5D Legend", 12)
 
     def start_game(self):
         """Initialize fully procedural game world"""
@@ -354,6 +354,10 @@ class Game:
         center_x = (MAP_SIZE // 2) * (self.WINDOW_WIDTH // MAP_SIZE)
         center_y = (MAP_SIZE // 2) * (self.WINDOW_HEIGHT // MAP_SIZE) + 20
         tile_size = self.WINDOW_WIDTH // MAP_SIZE
+        
+        # 2.5D Player Shadow
+        self.engine.rect(center_x + 2, center_y + tile_size - 2, tile_size - 4, 2, 0)
+        # Player Sprite
         self.engine.rect(center_x, center_y, tile_size, tile_size, self.colors["player"])
 
         # Draw HUD

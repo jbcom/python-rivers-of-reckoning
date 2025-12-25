@@ -6,11 +6,15 @@
 
 **Rivers of Reckoning** was originally created to inspire a love for programming in the creator's stepson, **Rivers**. This Python standalone version is a **Hero's Saga**, focusing on the character's journey and the world's increasing resistance (The Reckoning).
 
+## 📜 Evolution: Curses -> 2.5D -> Legend
+
+This game's genesis is a `curses` terminal teaching tool. We honor that by keeping the Python version in **2.5D space**. Do not attempt to move into 3D; the core identity is a grid-based world with depth.
+
 ### Standalone Identity
-- **The Hero**: Rivers is the center of the world. All mechanics should feel like challenges for a hero.
-- **The Reckoning**: A global "Fate" meter that triggers major world events and scales difficulty.
-- **The Flow of Fate**: Physical currents (formerly river flow) that push Rivers, representing external forces acting upon his destiny.
-- **Legendary Biomes**: Locations like **The Forsaken Path**, **The Iron Woods**, and **The Blistering Wastes** serve as backdrops for the saga.
+- **The Hero**: Rivers is the center of the world.
+- **2.5D Perspective**: Use Y-sorting and height offsets to create depth without 3D complexity.
+- **The Reckoning**: A global "Fate" meter that triggers major world events.
+- **The Flow of Fate**: Physical currents that push Rivers.
 
 ## 🎯 Design Principles
 

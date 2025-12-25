@@ -142,18 +142,27 @@ class Map:
                 # Draw base tile
                 engine.rect(px, py, self.tile_size, self.tile_size, color)
 
-                # Add visual detail for special tiles
+                # 2.5D Depth: Add visual detail for special tiles with height
                 if tile_type == TileType.TREE:
-                    # Draw tree crown
-                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 11)
+                    # Small shadow
+                    engine.rect(px + 2, py + self.tile_size - 2, self.tile_size - 4, 2, 0)
+                    # Tree trunk (Deep Void)
+                    engine.rect(px + self.tile_size // 2 - 1, py + 4, 2, self.tile_size - 4, 0)
+                    # Tree crown (Poison Ivy) - drawn higher for 2.5D effect
+                    engine.rect(px + 1, py - 2, self.tile_size - 2, self.tile_size - 4, 11)
                 elif tile_type == TileType.ROCK:
-                    # Draw rock detail
-                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 13)
+                    # Rock shadow
+                    engine.rect(px + 1, py + self.tile_size - 3, self.tile_size - 2, 2, 0)
+                    # Rock body (Wet Stone)
+                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 5)
+                    # Rock highlight
+                    engine.rect(px + 3, py + 3, 2, 2, 6)
                 elif tile_type == TileType.WATER:
-                    # Draw water ripple
+                    # Animated ripple effect using a simple frame counter if available
+                    # For now, just a static ripple
                     engine.rect(px + 4, py + 4, 2, 2, 12)
                 elif tile_type == TileType.STONE:
-                    # Draw stone texture
+                    # Stone texture
                     engine.rect(px + 4, py + 4, 2, 2, 5)
 
     def move_player(self, player, dx, dy):

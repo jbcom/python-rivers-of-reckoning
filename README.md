@@ -8,6 +8,14 @@
 
 Unlike other titles that explore literal geography, this game is the story of a character named **Rivers** and his journey through an infinite, procedurally generated world. As Rivers explores, he must manage the **Reckoning**—a global threat meter that represents the world's increasing resistance to his journey.
 
+## 📜 The Genesis of Rivers
+
+**Rivers of Reckoning** began as a simple `curses`-based terminal interface, created by a father to teach his stepson, **Rivers**, the fundamentals of programming. Its evolution from a text-based grid to a 2.5D graphical saga mirrors the learning journey itself.
+
+*   **Era 1: Curses (Terminal)**: Pure logic, character-based movement, and ASCII "rivers".
+*   **Era 2: Python 2.5D (Current)**: The "Goldilocks" zone of game dev—combining the readability of Python with the spatial depth of a 2.5D perspective. Unlike 3D engines that focus on geometry, this version focuses on **the grid, the logic, and the flow**.
+*   **Era 3: OSS Standalone**: Now an open-source tribute, maintaining its 2.5D identity to stand apart from 3D clones, preserving the "approachable" feel of its Python roots.
+
 ### ⚔️ Unique Standalone Features
 
 *   **The Hero's Burden (Reckoning Meter)**: Your presence in the world is not ignored. As you survive and grow, the world strikes back with **Reckoning Surges**—violent events that test your health and resolve.
