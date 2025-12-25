@@ -1,0 +1,173 @@
+---
+description: Python standards for Rivers of Reckoning
+globs: "**/*.py"
+---
+
+# Python Standards - Rivers of Reckoning
+
+## 🌊 Game-Specific Patterns
+
+### Async Required
+
+All entry points and game loops MUST be async for pygbag compatibility:
+
+```python
+# ✅ Correct - async pattern
+async def main():
+    game = Game()
+    await game.engine.run(game.update, game.draw)
+
+# ❌ Wrong - blocking pattern
+def main():
+    game = Game()
+    game.run()  # Blocks forever, breaks pygbag
+```
+
+### No Blocking Calls
+
+```python
+# ❌ Never use these
+import time
+time.sleep(1)           # Blocks browser
+input("Press enter")    # No stdin in browser
+open("file.txt")        # No filesystem in browser
+
+# ✅ Use async alternatives
+await asyncio.sleep(0)  # Yield to browser
+```
+
+### ECS Components
+
+Components are pure data (dataclasses):
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Position:
+    x: float = 0.0
+    y: float = 0.0
+
+@dataclass
+class Health:
+    current: int = 10
+    maximum: int = 10
+```
+
+### Procedural Generation
+
+Use opensimplex for coherent noise:
+
+```python
+from opensimplex import OpenSimplex
+
+noise = OpenSimplex(seed=42)
+value = noise.noise2(x * 0.1, y * 0.1)  # Returns -1 to 1
+```
+
+## Style
+
+- **Formatter**: Ruff (Black-compatible)
+- **Line length**: 100 characters (game code can be verbose)
+- **Imports**: Sorted by ruff
+
+```bash
+# Format and lint
+flake8 src/
+```
+
+## Naming
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| Functions/Variables | snake_case | `get_biome()` |
+| Classes | PascalCase | `ProceduralWorld` |
+| Constants | UPPER_CASE | `LOGICAL_WIDTH` |
+| Components | PascalCase | `Position`, `Health` |
+| Processors | PascalCase+Processor | `MovementProcessor` |
+
+## Type Hints
+
+```python
+# ✅ Modern style (Python 3.10+)
+def get_tile(self, x: int, y: int) -> tuple[TileType, BiomeType]:
+    ...
+
+# For complex types
+from typing import Callable
+UpdateFunc = Callable[[], None]
+DrawFunc = Callable[[], None]
+```
+
+## Package Management
+
+- **Tool**: uv
+- **Config**: `pyproject.toml`
+- **Lock file**: `uv.lock` (always commit)
+
+```bash
+uv sync                 # Install deps
+uv add pygame-ce        # Add dependency
+uv lock                 # Update lockfile
+```
+
+## Testing
+
+```bash
+pytest                  # Run all tests
+pytest -v               # Verbose
+pytest test_game_logic.py::test_specific  # Single test
+```
+
+### Test Patterns
+
+```python
+def test_procedural_variety():
+    """Different seeds produce different worlds."""
+    maps = [Map(seed=i * 100) for i in range(5)]
+    # Convert to tuples for comparison
+    grids = [tuple(tuple(row) for row in m.grid) for m in maps]
+    assert len(set(grids)) > 1  # At least 2 unique
+
+def test_walkability():
+    """Non-walkable tiles block movement."""
+    m = Map(seed=42)
+    for tile in ["#", "T", "R", "o"]:
+        # These tiles should not be walkable
+        ...
+```
+
+## Docstrings (Google Style)
+
+```python
+def get_biome_at(x: int, y: int) -> BiomeType:
+    """Determine the biome at world coordinates.
+
+    Uses temperature and moisture noise to classify terrain
+    into biome types following Whittaker's classification.
+
+    Args:
+        x: World X coordinate
+        y: World Y coordinate
+
+    Returns:
+        BiomeType enum value for this location
+    """
+```
+
+## Imports Order
+
+```python
+# 1. Standard library
+import asyncio
+from dataclasses import dataclass
+from enum import Enum, auto
+
+# 2. Third-party
+import pygame
+from opensimplex import OpenSimplex
+
+# 3. Local
+from .engine import Engine
+from .systems import Position, Health
+```

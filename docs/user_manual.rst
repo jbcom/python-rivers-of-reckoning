@@ -4,10 +4,9 @@ User Manual
 Introduction
 ============
 
-**Rivers of Reckoning** is an immersive, procedurally generated 3D roguelike RPG 
-built for instant web play. Explore an infinite, ever-changing world of marshes, 
-forests, deserts, and tundra. Every playthrough is unique, generated from a seed 
-that creates coherent biomes, dynamic weather, and challenging encounters.
+First Python RPG is a retro-style role-playing game featuring procedural generation,
+dynamic weather systems, and an engaging quest system. Explore dungeons, battle enemies,
+and become a legendary hero!
 
 Getting Started
 ===============
@@ -15,19 +14,10 @@ Getting Started
 Launching the Game
 ------------------
 
-Launch the game using the following command:
-
-.. code-block:: bash
-
-   python main.py
-
-The game uses a "Web-First" architecture, meaning it's designed to run at a logical 
-resolution of 256x256 and automatically scales to fit your window size.
+Launch the game using ``python main.py`` or ``first-python-rpg`` if installed via pip.
 
 Controls
 ========
-
-The game features a tactile feedback system with responsive controls.
 
 Desktop
 -------
@@ -38,72 +28,79 @@ Desktop
 
    * - Key
      - Action
-   * - **Arrow Keys**
-     - Move your character through the world
-   * - **Enter / Space**
+   * - Arrow Keys
+     - Move your character
+   * - Enter
      - Start game / Confirm selection
-   * - **Escape**
-     - Pause game / Return to title screen
-   * - **A**
-     - Attack (Boss Battles)
-   * - **S**
-     - Cast Spell (Boss Battles)
-   * - **Q**
-     - Quit to menu (when paused)
-
-Mobile & Touch
---------------
-
-When playing in a browser on a mobile device, the game utilizes **pygbag's 
-integrated virtual gamepad**. 
-
-* **On-screen D-pad**: Use the virtual directional pad on the left to move.
-* **On-screen Buttons**: Use the 'A' and 'B' buttons on the right for interaction 
-  and combat.
-* **Responsive Scaling**: The game will automatically rotate and scale to fit 
-  your device's orientation.
+   * - Space
+     - Toggle features / Interact
+   * - Escape
+     - Pause game / Return to menu
+   * - Q
+     - Toggle Quest Log
+   * - W
+     - Toggle Weather Info
 
 Game Features
 =============
 
-Procedural World Generation
----------------------------
+Feature Selection
+-----------------
 
-The world of Rivers of Reckoning is generated entirely from noise functions:
+When you launch the game, you'll be greeted with the **Feature Select** screen.
+Here you can toggle various game features on or off before starting your adventure:
 
-- **Infinite Exploration**: The world expands as you move.
-- **Dynamic Biomes**: Transition between Marshes, Forests, Deserts, and Tundra.
-- **Seeded Worlds**: Every world is unique but reproducible using a seed.
+- **Random Events** - Encounter random events while exploring
+- **Difficulty Levels** - Enable harder difficulty settings
+- **Enemy Encounters** - Toggle random enemy battles
+- **Procedural Dungeons** - Generate unique dungeon layouts
+- **Dynamic Quests** - Enable the quest system
+- **Weather System** - Dynamic weather affects gameplay
 
-Weather & Environment
----------------------
+Procedural Dungeons
+-------------------
 
-- **Dynamic Weather**: Experience rain, storms, and clear skies that affect 
-  visibility and atmosphere.
-- **Day/Night Cycle**: The environment changes as time passes in the game world.
+When enabled, each playthrough generates a unique dungeon layout with:
 
-Combat & Progression
-====================
+- Randomly placed walls and obstacles
+- Various terrain types (grass, water, rocks)
+- Strategic placement of enemies and items
 
-- **Enemy Spawning**: Enemies spawn procedurally based on the current biome and 
-  your distance from the start.
-- **Combat Mechanics**: Use a combination of melee attacks and spells to defeat 
-  foes.
-- **Experience (XP)**: Gain XP by exploring and defeating enemies to level up 
-  your character.
+Dynamic Weather System
+----------------------
 
-Tips for Survival
-=================
+The weather system adds atmosphere and can affect gameplay:
 
-1. **Watch the Biome**: Different biomes have different enemy types and spawn rates.
-2. **Keep Moving**: Exploration is the key to finding better loot and gaining XP.
-3. **Use Spells Wisely**: Mana is a limited resource; save your spells for 
-  tougher encounters.
+- **Clear** - Normal visibility and movement
+- **Rain** - Reduced visibility
+- **Storm** - Dangerous conditions
+
+Combat
+======
+
+Enemy Encounters
+----------------
+
+When enemy encounters are enabled, you may randomly encounter enemies while moving.
+Each enemy has:
+
+- A name and type (Goblin, Orc, Slime, Wraith)
+- Damage modifiers based on their type
+- Health scaled to the current difficulty
+
+Tips and Strategies
+===================
+
+1. **Toggle features wisely** - Start with fewer features enabled while learning
+2. **Watch your health** - Keep track of damage from encounters
+3. **Complete quests** - Quests provide gold rewards
+4. **Explore carefully** - Procedural dungeons may contain surprises
+5. **Check the weather** - Weather can affect your adventure
 
 Credits
 =======
 
-Rivers of Reckoning is built with **pygame-ce** and deployed for the web 
-using **pygbag**.
+First Python RPG was created as a demonstration of Python game development
+using the Pygame-ce game engine.
 
 Enjoy your adventure!

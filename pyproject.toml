@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "first-python-rpg"
+version = "0.5.0"
+description = "Rivers of Reckoning - A fully procedural RPG with infinite world generation, ECS architecture, dynamic biomes, and web deployment via pygbag."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Your Name", email = "you@example.com" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment :: Role-Playing",
+]
+dependencies = [
+    "pygame-ce>=2.5.0",
+    "esper>=3.2",
+    "opensimplex>=0.4.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "black>=24.0.0",
+    "flake8>=7.3.0",
+]
+docs = [
+    "sphinx>=7.0.0,<9.0.0",
+    "sphinx-rtd-theme>=2.0.0,<3.0.0",
+]
+web = [
+    "pygbag>=0.9.2",
+]
+
+[project.scripts]
+first-python-rpg = "first_python_rpg.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/first_python_rpg"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/images",
+    "/music",
+    "/main.py",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+addopts = "-v"
+
+[tool.black]
+line-length = 127
+target-version = ["py310", "py311", "py312", "py313"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "black>=24.0.0",
+    "flake8>=7.3.0",
+]
