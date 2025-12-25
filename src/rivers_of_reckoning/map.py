@@ -118,14 +118,13 @@ class Map:
         return self.world.is_walkable(x, y)
 
     def draw(self, engine):
-        """Draw the visible map using Engine.
-
-        Args:
-            engine: The Engine instance for rendering
-        """
+        """Draw the visible map using Engine and procedural world generation."""
         if engine is None:
             return
 
+        # Map tile size adjusted for 960x960
+        draw_tile_size = engine.width // self.size
+        
         for local_y in range(self.size):
             for local_x in range(self.size):
                 world_x = self.camera_x + local_x
@@ -136,34 +135,29 @@ class Map:
                 color = TILE_COLORS.get(char, 0)
 
                 # Calculate pixel position
-                px = local_x * self.tile_size
-                py = local_y * self.tile_size + 20  # Offset for HUD
+                px = local_x * draw_tile_size
+                py = local_y * draw_tile_size + 60  # Offset for high-res HUD
 
                 # Draw base tile
-                engine.rect(px, py, self.tile_size, self.tile_size, color)
+                engine.rect(px, py, draw_tile_size, draw_tile_size, color)
 
-                # 2.5D Depth: Add visual detail for special tiles with height
+                # 2.5D Depth: High-res visual detail
                 if tile_type == TileType.TREE:
-                    # Small shadow
-                    engine.rect(px + 2, py + self.tile_size - 2, self.tile_size - 4, 2, 0)
-                    # Tree trunk (Deep Void)
-                    engine.rect(px + self.tile_size // 2 - 1, py + 4, 2, self.tile_size - 4, 0)
-                    # Tree crown (Poison Ivy) - drawn higher for 2.5D effect
-                    engine.rect(px + 1, py - 2, self.tile_size - 2, self.tile_size - 4, 11)
+                    # Tree shadow
+                    engine.circ(px + draw_tile_size // 2, py + draw_tile_size - 10, draw_tile_size // 3, 0)
+                    # Tree trunk
+                    engine.rect(px + draw_tile_size // 2 - 4, py + 20, 8, draw_tile_size - 20, 4)
+                    # Tree crown (Poison Ivy) - layered for height
+                    engine.circ(px + draw_tile_size // 2, py + 15, draw_tile_size // 2 - 5, 11)
+                    engine.circ(px + draw_tile_size // 2, py + 5, draw_tile_size // 3, 3)
                 elif tile_type == TileType.ROCK:
-                    # Rock shadow
-                    engine.rect(px + 1, py + self.tile_size - 3, self.tile_size - 2, 2, 0)
-                    # Rock body (Wet Stone)
-                    engine.rect(px + 2, py + 2, self.tile_size - 4, self.tile_size - 4, 5)
-                    # Rock highlight
-                    engine.rect(px + 3, py + 3, 2, 2, 6)
+                    # Rock body
+                    engine.rect(px + 10, py + 10, draw_tile_size - 20, draw_tile_size - 20, 5)
+                    engine.rect(px + 15, py + 15, 10, 10, 6)
                 elif tile_type == TileType.WATER:
-                    # Animated ripple effect using a simple frame counter if available
-                    # For now, just a static ripple
-                    engine.rect(px + 4, py + 4, 2, 2, 12)
-                elif tile_type == TileType.STONE:
-                    # Stone texture
-                    engine.rect(px + 4, py + 4, 2, 2, 5)
+                    # High-res river ripple
+                    engine.line(px + 10, py + 20, px + 30, py + 20, 12)
+                    engine.line(px + 20, py + 40, px + 50, py + 40, 12)
 
     def move_player(self, player, dx, dy):
         """Move player with world constraints.

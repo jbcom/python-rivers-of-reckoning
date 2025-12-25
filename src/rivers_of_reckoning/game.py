@@ -12,6 +12,7 @@ from .player import Player
 from .enemy import Enemy
 from .map_data import MAP_SIZE, EVENT_TYPES
 from .engine import Engine, LOGICAL_WIDTH, LOGICAL_HEIGHT
+from .assets import AssetManager
 from .systems import create_game_world
 from .world_gen import BIOME_CONFIGS, BiomeType, TileType
 
@@ -37,14 +38,19 @@ class Game:
         # Initialize responsive Engine (auto-scales to any screen)
         if not test_mode:
             self.engine = Engine()
+            self.assets = AssetManager()
         else:
             self.engine = None
+            self.assets = None
 
         # Game state
         self.running = True
         self.state = "title"  # 'title', 'playing', 'paused', 'gameover', 'boss'
 
-        # ECS World for systems
+        # Animation state
+        self.anim_frame = 0
+        self.anim_timer = 0
+        self.title_frame = 0
         self.ecs_world = None
         self.time_entity = None
         self.weather_entity = None
@@ -210,6 +216,11 @@ class Game:
             self.state = "paused"
             return
 
+        # Update animations
+        self.anim_timer += 1
+        if self.anim_timer % 10 == 0:
+            self.anim_frame += 1
+
         # Update Reckoning: slowly increases over time and distance
         self.reckoning_timer += 1
         if self.reckoning_timer % 60 == 0:
@@ -343,22 +354,33 @@ class Game:
         self.enemies_defeated += 1
 
     def draw_playing(self):
-        """Draw playing state with procedural world"""
+        """Draw playing state with procedural world and high-res assets"""
         if not self.engine:
             return
 
         # Draw procedural map
         self.map.draw(self.engine)
 
-        # Draw player at screen center (camera follows player)
-        center_x = (MAP_SIZE // 2) * (self.WINDOW_WIDTH // MAP_SIZE)
-        center_y = (MAP_SIZE // 2) * (self.WINDOW_HEIGHT // MAP_SIZE) + 20
-        tile_size = self.WINDOW_WIDTH // MAP_SIZE
+        # Draw player with rich animations (camera follows player)
+        # Scale player drawing to 960x960 context
+        tile_px_size = self.WINDOW_WIDTH // MAP_SIZE
+        center_x = (MAP_SIZE // 2) * tile_px_size
+        center_y = (MAP_SIZE // 2) * tile_px_size + 40 # Offset for HUD
         
         # 2.5D Player Shadow
-        self.engine.rect(center_x + 2, center_y + tile_size - 2, tile_size - 4, 2, 0)
-        # Player Sprite
-        self.engine.rect(center_x, center_y, tile_size, tile_size, self.colors["player"])
+        self.engine.circ(center_x + tile_px_size // 2, center_y + tile_px_size - 10, tile_px_size // 3, 0)
+        
+        # Get correct animation based on state
+        state = 'idle'
+        if self.engine.btn('up') or self.engine.btn('down') or self.engine.btn('left') or self.engine.btn('right'):
+            state = 'run'
+        
+        player_surf = self.assets.get_anim('character', state, self.anim_frame)
+        if player_surf:
+            self.engine.blit(player_surf, (center_x, center_y))
+        else:
+            # Fallback if asset manager missing
+            self.engine.rect(center_x, center_y, tile_px_size, tile_px_size, self.colors["player"])
 
         # Draw HUD
         self.draw_enhanced_hud()
@@ -368,38 +390,32 @@ class Game:
             self.draw_event_message()
 
     def draw_enhanced_hud(self):
-        """Draw unique Rivers of Reckoning HUD"""
+        """Draw high-res Rivers of Reckoning HUD"""
         if not self.engine:
             return
 
         # Top Background Panel
-        self.engine.rect(0, 0, self.WINDOW_WIDTH, 28, 1)  # Dark Water background
-        self.engine.line(0, 28, self.WINDOW_WIDTH, 28, 7)  # Froth border
+        self.engine.rect(0, 0, self.WINDOW_WIDTH, 60, 1)  # Dark Water background
+        self.engine.line(0, 60, self.WINDOW_WIDTH, 60, 7)  # Froth border
 
         # Health Bar - Branded
-        self.engine.text(5, 4, "RIVERS", 7)
-        self.engine.bar(45, 5, 60, 8, self.player.health, self.player.max_health, 8, 0)
+        self.engine.text(20, 15, "RIVERS", 7)
+        self.engine.bar(120, 18, 250, 20, self.player.health, self.player.max_health, 8, 0)
 
         # RECKONING Meter - Unique Mechanic
-        self.engine.text(115, 4, "DESTINY", 14)  # Pink/Purple highlight
+        self.engine.text(450, 15, "DESTINY", 14)
         reck_progress = self.reckoning_level % 100
-        self.engine.bar(175, 5, 75, 8, reck_progress, 100, 14, 0)
-
-        # Sub-stats row
-        biome_config = BIOME_CONFIGS.get(self.current_biome)
-        biome_name = biome_config.name if biome_config else "???"
-        self.engine.text(5, 16, f"BIOME: {biome_name}", 11)
-        self.engine.text(115, 16, f"GOLD: {self.player.gold}", 10)
-        self.engine.text(180, 16, f"DIST: {self.distance_traveled}", 6)
+        self.engine.bar(580, 18, 300, 20, reck_progress, 100, 14, 0)
 
         # Bottom Info Bar
-        self.engine.rect(0, self.WINDOW_HEIGHT - 12, self.WINDOW_WIDTH, 12, 0)
-        self.engine.line(0, self.WINDOW_HEIGHT - 12, self.WINDOW_WIDTH, self.WINDOW_HEIGHT - 12, 6)
-        self.engine.text(
-            5, self.WINDOW_HEIGHT - 10,
-            f"REGION: {self.player.x // 100}:{self.player.y // 100}  |  LVL: {self.player.level}",
-            6
-        )
+        self.engine.rect(0, self.WINDOW_HEIGHT - 40, self.WINDOW_WIDTH, 40, 0)
+        self.engine.line(0, self.WINDOW_HEIGHT - 40, self.WINDOW_WIDTH, self.WINDOW_HEIGHT - 40, 6)
+        
+        biome_config = BIOME_CONFIGS.get(self.current_biome)
+        biome_name = biome_config.name if biome_config else "???"
+        
+        info_text = f"REGION: {self.player.x // 100}:{self.player.y // 100} | BIOME: {biome_name} | LVL: {self.player.level} | GOLD: {self.player.gold}"
+        self.engine.text(20, self.WINDOW_HEIGHT - 30, info_text, 6)
 
     def draw_event_message(self):
         """Draw event message dialog"""

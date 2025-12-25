@@ -61,6 +61,8 @@ The saga takes place across a handcrafted procedural world.
 
 ## 🛠 Technical Manifesto
 - **Foundation**: Pure Python 3.10+, `pygame-ce`.
+- **Resolution**: **960x960 logical pixels**, high-definition Pygame roots auto-scaled for any viewport.
+- **Visuals**: Full character animations (`idle`, `run`, `attack`, `swim`) and rich tile textures.
 - **Logic**: Simplified grid-based logic inspired by the original `curses` version.
 - **Deployment**: Optimized for `pygbag` web play.
 - **Architecture**: Modular and readable, serving as a beacon for aspiring programmers.

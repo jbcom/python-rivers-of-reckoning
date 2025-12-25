@@ -8,9 +8,9 @@ import pygame
 import asyncio
 
 
-# Logical resolution (game thinks in these coordinates)
-LOGICAL_WIDTH = 256
-LOGICAL_HEIGHT = 256
+# Logical resolution (matches original Pygame RPG)
+LOGICAL_WIDTH = 960
+LOGICAL_HEIGHT = 960
 
 # 16-color retro palette - Rivers of Reckoning Branded
 PALETTE = {
@@ -61,8 +61,8 @@ class Engine:
         self.width = LOGICAL_WIDTH
         self.height = LOGICAL_HEIGHT
 
-        # Font for text rendering (scaled appropriately)
-        self.font = pygame.font.Font(None, 12)  # Slightly larger for better readability
+        # Font for text rendering (scaled for 960x960)
+        self.font = pygame.font.Font(None, 32)
 
         # Input state for proper btnp (button pressed this frame)
         self._keys_pressed = set()
@@ -286,6 +286,18 @@ class Engine:
         ox, oy = self.get_draw_offset()
         c = PALETTE.get(col, (255, 255, 255))
         pygame.draw.line(self.screen, c, (x1 + ox, y1 + oy), (x2 + ox, y2 + oy))
+
+    def blit(self, surface, pos):
+        """Blit a surface to the screen with shake offset.
+
+        Args:
+            surface: Pygame surface to draw
+            pos: (x, y) coordinates
+        """
+        if surface is None:
+            return
+        ox, oy = self.get_draw_offset()
+        self.screen.blit(surface, (pos[0] + ox, pos[1] + oy))
 
     def bar(self, x, y, w, h, val, max_val, col_fill, col_bg=0):
         """Draw a progress bar.
