@@ -7,7 +7,7 @@ def test_sprite_functions():
     print("Testing sprite procedural generation...")
 
     try:
-        from rivers_of_reckoning.map_data import SPRITES, BOSS_SPRITES
+        from rivers_of_reckoning.map_data import BOSS_SPRITES, SPRITES
 
         # Test regular sprites
         sprite_count = len(SPRITES)
@@ -67,8 +67,8 @@ def test_game_components():
         # Test boss import
         from rivers_of_reckoning.boss import (
             boss_battle,
-            update_boss_battle,
             draw_boss_battle,
+            update_boss_battle,
         )
 
         print("✓ Boss system imported successfully")

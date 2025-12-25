@@ -1,7 +1,7 @@
-from rivers_of_reckoning.player import Player
 from rivers_of_reckoning.enemy import Enemy
 from rivers_of_reckoning.map import Map
 from rivers_of_reckoning.map_data import ENEMY_TYPES, EVENT_TYPES
+from rivers_of_reckoning.player import Player
 
 
 # --- Player Gear, Gold, Potions, Achievements ---

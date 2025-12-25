@@ -5,8 +5,8 @@ This provides a command-line interface that works the same as
 the main.py entry point, using async for pygbag compatibility.
 """
 
-import sys
 import asyncio
+import sys
 
 
 async def run_game():

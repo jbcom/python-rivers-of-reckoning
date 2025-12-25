@@ -4,13 +4,13 @@
 
 def test_library_import():
     """Test that we can import the library modules"""
-    from rivers_of_reckoning import Game, Player, Enemy
+    from rivers_of_reckoning import Enemy, Game, Player
 
     print("✓ Core library imports successful")
 
     # Test individual module imports
     from rivers_of_reckoning.map import Map
-    from rivers_of_reckoning.map_data import MAP_SIZE, ENEMY_TYPES
+    from rivers_of_reckoning.map_data import ENEMY_TYPES, MAP_SIZE
     from rivers_of_reckoning.procedural_enemies import ProceduralEnemyGenerator
 
     print("✓ All module imports successful")
@@ -27,7 +27,7 @@ def test_library_import():
 
 def test_basic_functionality():
     """Test basic game object creation"""
-    from rivers_of_reckoning import Player, Enemy
+    from rivers_of_reckoning import Enemy, Player
     from rivers_of_reckoning.map import Map
     from rivers_of_reckoning.procedural_enemies import ProceduralEnemyGenerator
 

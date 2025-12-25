@@ -5,6 +5,7 @@ objects, weapons, and the world map.
 """
 
 import os
+
 import pygame
 
 # Asset directory relative to the package

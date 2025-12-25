@@ -6,7 +6,8 @@ Uses noise functions to generate coherent, natural-looking worlds.
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Tuple, List
+from typing import List, Tuple
+
 from opensimplex import OpenSimplex
 
 # Initialize noise generators with different seeds for variety

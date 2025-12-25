@@ -1,6 +1,7 @@
 """Boss battle system using pygame-ce Engine."""
 
 import random
+
 from .map_data import BOSS_NAMES
 
 

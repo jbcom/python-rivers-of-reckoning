@@ -1,4 +1,5 @@
 import random
+
 from .map_data import DIFFICULTY_LEVELS, MAP_SIZE
 
 

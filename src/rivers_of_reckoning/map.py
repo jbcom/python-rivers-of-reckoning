@@ -5,8 +5,9 @@ using the pygame-ce Engine abstraction with procedural world generation.
 """
 
 import random
+
 from .map_data import MAP_SIZE, TILE_COLORS
-from .world_gen import ProceduralWorld, TileType, BiomeType, BIOME_CONFIGS
+from .world_gen import BIOME_CONFIGS, BiomeType, ProceduralWorld, TileType
 
 
 class Map:

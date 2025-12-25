@@ -8,6 +8,7 @@ Best practices followed:
 - Avoids testing implementation details
 - Uses explicit waits with timeouts
 """
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -20,6 +21,7 @@ def base_url():
     Locally, you can run: python -m http.server 8000 -d build/web
     """
     import os
+
     return os.getenv("BASE_URL", "http://localhost:8000")
 
 

@@ -12,8 +12,8 @@ __description__ = (
     "ECS architecture, dynamic biomes, and web deployment via pygbag."
 )
 
+from .enemy import Enemy
 from .game import Game
 from .player import Player
-from .enemy import Enemy
 
 __all__ = ["Game", "Player", "Enemy"]

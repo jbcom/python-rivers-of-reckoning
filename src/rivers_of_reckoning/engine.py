@@ -4,9 +4,9 @@ Uses pygame.SCALED for automatic resolution scaling that works
 seamlessly with pygbag for browser-based gameplay.
 """
 
-import pygame
 import asyncio
 
+import pygame
 
 # Logical resolution (matches original Pygame RPG)
 LOGICAL_WIDTH = 960

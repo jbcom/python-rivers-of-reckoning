@@ -1,5 +1,6 @@
-from .map_data import SHOP_ITEMS
 import time
+
+from .map_data import SHOP_ITEMS
 
 
 def shop_menu(stdscr, player):

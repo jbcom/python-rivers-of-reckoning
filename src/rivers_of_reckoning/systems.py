@@ -7,12 +7,12 @@ Note: esper 3.x uses module-level functions instead of a World class.
 This module provides a lightweight wrapper for game systems.
 """
 
-import esper
-import random
 import math
+import random
 from dataclasses import dataclass
 from enum import Enum, auto
 
+import esper
 
 # =============================================================================
 # COMPONENTS (pure data)

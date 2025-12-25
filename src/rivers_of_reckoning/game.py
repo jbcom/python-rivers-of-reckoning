@@ -8,11 +8,12 @@ natural terrain, biomes, weather, and day/night cycles.
 """
 
 import random
-from .player import Player
-from .enemy import Enemy
-from .map_data import MAP_SIZE, EVENT_TYPES
-from .engine import Engine, LOGICAL_WIDTH, LOGICAL_HEIGHT
+
 from .assets import AssetManager
+from .enemy import Enemy
+from .engine import LOGICAL_HEIGHT, LOGICAL_WIDTH, Engine
+from .map_data import EVENT_TYPES, MAP_SIZE
+from .player import Player
 from .systems import create_game_world
 from .world_gen import BIOME_CONFIGS, BiomeType, TileType
 
@@ -247,7 +248,7 @@ class Game:
 
     def move_player(self, dx, dy):
         """Move player through procedural world with unique flow effects.
-        
+
         CRITICAL FIX: Apply confusion BEFORE walkability check to prevent
         confused players from walking through walls.
         """
@@ -255,7 +256,7 @@ class Game:
         actual_dx, actual_dy = dx, dy
         if self.player.confused > 0 and random.random() < 0.5:
             actual_dx, actual_dy = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
-        
+
         new_x = self.player.x + actual_dx
         new_y = self.player.y + actual_dy
 

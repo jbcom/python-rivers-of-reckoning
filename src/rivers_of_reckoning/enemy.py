@@ -1,4 +1,5 @@
 import random
+
 from .map_data import ENEMY_TYPES
 
 
