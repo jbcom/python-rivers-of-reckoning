@@ -13,7 +13,7 @@ from .enemy import Enemy
 from .map_data import MAP_SIZE, EVENT_TYPES
 from .engine import Engine, LOGICAL_WIDTH, LOGICAL_HEIGHT
 from .systems import create_game_world
-from .world_gen import BIOME_CONFIGS, BiomeType
+from .world_gen import BIOME_CONFIGS, BiomeType, TileType
 
 # Event message display duration (frames at 60 FPS = 3 seconds)
 EVENT_MESSAGE_DURATION = 180
@@ -146,7 +146,7 @@ class Game:
         # Subtitle with misty color
         self.engine.text(
             self.WINDOW_WIDTH // 2 - 60, 60,
-            "The Waters are Rising...", 6
+            "The Saga of Rivers Begins...", 6
         )
 
         # Visual Divider
@@ -154,11 +154,11 @@ class Game:
 
         # Features list with themed icons
         features = [
-            "~ Hostile River Currents",
-            "~ Sinking Mire & Choking Woods",
+            "~ The Flow of Fate",
+            "~ The Iron Woods & Frozen Veil",
             "~ The Global Reckoning Meter",
-            "~ Tactical Flow Navigation",
-            "~ Perma-death Survival",
+            "~ Tactical Destiny Navigation",
+            "~ Perma-death Saga Survival",
         ]
         for i, feature in enumerate(features):
             col = 11 if (self.title_frame // 30) % len(features) == i else 3
@@ -252,8 +252,8 @@ class Game:
             self.player.move(dx, dy, wrap=False)
             self.distance_traveled += 1
 
-            # Unique Mechanic: River Flow
-            # If player is in water, they get pushed by the current
+            # Unique Mechanic: The Flow of Fate
+            # If player is in water (Fate), they get pushed by the current
             tile_type, _ = self.map.world.get_tile(self.player.x, self.player.y)
             if tile_type == TileType.WATER:
                 fdx, fdy = self.map.world.get_water_flow(self.player.x, self.player.y)
@@ -261,7 +261,7 @@ class Game:
                     self.player.move(fdx, fdy, wrap=False)
                     # No extra distance for flow movement
                     if self.event_timer <= 0:
-                        self.event_message = "[FLOW] The current pulls you..."
+                        self.event_message = "[FATE] A current pulls at your destiny..."
                         self.event_timer = 30  # Short message
 
             # Update camera to follow player
@@ -289,10 +289,10 @@ class Game:
             self.engine.shake(10, 60)  # Violent shake
         
         surge_types = [
-            "THE WATERS RISE!",
-            "THE EARTH RECKONS!",
-            "THE FOG THICKENS!",
-            "A SURGE OF ANGER!",
+            "FATE AWAKENS!",
+            "THE WORLD RECKONS!",
+            "DESTINY OVERFLOWS!",
+            "A SURGE OF LEGEND!",
         ]
         msg = random.choice(surge_types)
         self.event_message = f"!!! {msg} !!!"
@@ -373,11 +373,11 @@ class Game:
         self.engine.line(0, 28, self.WINDOW_WIDTH, 28, 7)  # Froth border
 
         # Health Bar - Branded
-        self.engine.text(5, 4, "HEALTH", 7)
+        self.engine.text(5, 4, "RIVERS", 7)
         self.engine.bar(45, 5, 60, 8, self.player.health, self.player.max_health, 8, 0)
 
         # RECKONING Meter - Unique Mechanic
-        self.engine.text(115, 4, "RECKONING", 14)  # Pink/Purple highlight
+        self.engine.text(115, 4, "DESTINY", 14)  # Pink/Purple highlight
         reck_progress = self.reckoning_level % 100
         self.engine.bar(175, 5, 75, 8, reck_progress, 100, 14, 0)
 

@@ -1,93 +1,55 @@
 # Rivers of Reckoning [PYTHON STANDALONE]
 
-> **The Waters are Rising. The Reckoning is Near.**
+> **The World Awakens. The Reckoning Begins.**
 
-An immersive, procedurally generated survival roguelike RPG built exclusively with **Python and pygame-ce**. While other games explore the serenity of the marsh, this is a journey of **Hostile Escalation**.
+**Rivers of Reckoning** is an atmospheric survival roguelike RPG built exclusively with **Python and pygame-ce**. Originally created to inspire a love for programming in its namesake, Rivers, this game is a standalone **Hero's Saga** that focuses on the physical struggle against a world that actively fights your progress.
 
-## 🌊 Unique Standalone Identity
+## 🌊 The Legend of Rivers
 
-*   **The Reckoning Meter**: A unique global threat system. As you explore and survive, the world itself becomes more hostile, triggering major "Surge" events that physically reshape your struggle.
-*   **Adaptive River Flow**: Water isn't just a tile; it's a force. Procedural currents physically pull your character and enemies, requiring tactical navigation to "surf" or "fight" the flow.
-*   **Hostile Biomes**: Explore the **Sinking Mire**, **Choking Woods**, and **Blistering Wastes**—environments designed to actively resist your presence.
-*   **Grim Retro Juice**: A high-contrast "Rivers" palette (Sulfur, Poison, Blood) combined with aggressive screen shake and impactful combat feedback.
-*   **Pure Python**: Optimized for peak performance via `pygame-ce` and seamless web play via `pygbag` WASM.
+Unlike other titles that explore literal geography, this game is the story of a character named **Rivers** and his journey through an infinite, procedurally generated world. As Rivers explores, he must manage the **Reckoning**—a global threat meter that represents the world's increasing resistance to his journey.
+
+### ⚔️ Unique Standalone Features
+
+*   **The Hero's Burden (Reckoning Meter)**: Your presence in the world is not ignored. As you survive and grow, the world strikes back with **Reckoning Surges**—violent events that test your health and resolve.
+*   **The Flow of Fate**: The world is filled with physical currents that push and pull you. Mastery of the **Flow** is essential for tactical movement and survival.
+*   **Legacy Biomes**: Explore the **Forsaken Path**, **Iron Woods**, and **Blistering Wastes**—each procedurally generated backdrops for your legendary run.
+*   **Branded 16-Color Palette**: A unique, high-contrast visual style (Deep Void, Sulfur, Poison, Blood) designed for atmospheric impact.
+*   **Juicy Tactical Feedback**: Every action has weight. Aggressive screen shake, impact frames, and animated UI elements create a high-quality "retro-plus" experience.
 
 ## 🎮 Core Gameplay
 
-*   **Tactical Navigation**: Use the river's flow to move faster or avoid enemies, but beware of being pulled into hazards.
-*   **Rising Threat**: Monitor the Reckoning Meter. Every step forward increases the world's anger.
-*   **Survival Roguelike**: Perma-death challenge where you must balance exploration rewards against the inevitable escalation of the Reckoning.
+*   **Fight the Flow**: Use the physical currents of the world to your advantage, or find yourself swept into lethal encounters.
+*   **Outrun the Reckoning**: The longer you survive, the harder the world fights. There is no standing still in the Saga of Rivers.
+*   **Perma-death Survival**: Every run is a unique legend. How far will your legacy reach?
 
-## 🛠️ Installation
+## 🛠️ Installation & Play
 
 ### Prerequisites
-
 - Python 3.10 or higher
 
-### Install Dependencies
-
-```bash
-# Using pip
-pip install pygame-ce opensimplex esper
-
-# For development
-pip install -e ".[dev]"
-```
-
-## 🎮 Running the Game
-
-### Desktop
-
+### Desktop Play
 ```bash
 # Using the CLI
 rivers-of-reckoning
 
-# Or using Python
+# Or using Python directly
 python main.py
 ```
 
-### Web
-
-To build locally for web:
-
+### Web Play
+Build the legend for the browser using `pygbag`:
 ```bash
 pip install pygbag
 python -m pygbag --build .
 ```
 
-## 🌍 Procedural Systems
+## 🌍 Procedural Saga Systems
 
-*   **FBM Noise Terrain**: Infinite, coherent world generation.
-*   **Whittaker Biomes**: Shifting environments based on moisture/temp.
-*   **Flow Fields**: Directional water currents derived from moisture noise.
-*   **ECS Architecture**: Clean separation of data and logic using `esper`.
-
-## 📁 Project Structure
-
-```
-├── main.py                      # THE entry point (async, pygbag-ready)
-├── src/rivers_of_reckoning/
-│   ├── engine.py                # Responsive pygame with juice & scaling
-│   ├── game.py                  # Main loop & Reckoning mechanics
-│   ├── world_gen.py             # Procedural biomes & Flow fields
-│   ├── systems.py               # ECS components & processors
-│   ├── map.py                   # Infinite scrolling camera
-│   ├── player.py                # Mechanics & stats
-│   ├── enemy.py                 # AI & spawning
-│   └── map_data.py              # Branded palette & constants
-└── tests/                       # Python test suite
-```
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🙏 Acknowledgments
-
-- **pygame-ce Community**: For the high-performance framework.
-- **pygbag**: For bringing Python to the web.
-- **Otterfall**: Inspiration for procedural ECS design.
+*   **FBM Noise Destiny**: Infinite, coherent world generation.
+*   **Whittaker Trials**: Shifting biomes based on environmental moisture and temperature.
+*   **Fate Fields**: Directional physical currents derived from procedural moisture noise.
+*   **ECS Chronicle**: Clean, modular code design using the `esper` Entity Component System.
 
 ---
 
-**"The further you go, the heavier the Reckoning."** Run: `python main.py`
+**"Your legacy is defined by the depth of your Reckoning."** Run: `python main.py`

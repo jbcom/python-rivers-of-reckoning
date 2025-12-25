@@ -56,7 +56,7 @@ class BiomeConfig:
 # Biome configurations inspired by the theme of Hostile Escalation
 BIOME_CONFIGS = {
     BiomeType.MARSH: BiomeConfig(
-        name="Sinking Mire",
+        name="The Forsaken Path",
         base_color=4,    # Mud Brown
         accent_color=11,  # Poison Ivy
         tree_density=0.1,
@@ -67,7 +67,7 @@ BIOME_CONFIGS = {
         visibility=0.7
     ),
     BiomeType.FOREST: BiomeConfig(
-        name="Choking Woods",
+        name="The Iron Woods",
         base_color=3,    # Moss Green
         accent_color=11,  # Poison Ivy
         tree_density=0.35,
@@ -89,7 +89,7 @@ BIOME_CONFIGS = {
         visibility=1.0
     ),
     BiomeType.TUNDRA: BiomeConfig(
-        name="Frozen Veil",
+        name="The Frozen Veil",
         base_color=7,    # Froth White
         accent_color=12,  # River Blue
         tree_density=0.05,

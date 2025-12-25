@@ -87,7 +87,7 @@ def test_map_walkable():
             walkable = m.is_walkable(world_x, world_y)
 
             # Verify walkability matches tile type
-            if tile in ("o", "#", "T", "R", "X"):
+            if tile in ("#", "T", "R", "X"):
                 assert not walkable, f"Tile '{tile}' at ({world_x},{world_y}) should not be walkable"
             else:
                 assert walkable, f"Tile '{tile}' at ({world_x},{world_y}) should be walkable"

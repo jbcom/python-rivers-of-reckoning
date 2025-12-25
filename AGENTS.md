@@ -1,91 +1,49 @@
 # AGENTS.md - Rivers of Reckoning [PYTHON STANDALONE]
 
-> **Instructions for AI agents working on this hostile survival procedural RPG**
+> **Instructions for AI agents working on the Saga of Rivers**
 
-## 🌊 The Core Message: "The Toll of the Journey"
+## 🌊 The Core Message: "Inspiring the Next Generation"
 
-Unlike traditional RPGs or the serene exploration of "Rivermarsh", **Rivers of Reckoning** is about **hostile escalation**. Every action and every step forward increases the **Reckoning**—the world's active resistance to your presence.
+**Rivers of Reckoning** was originally created to inspire a love for programming in the creator's stepson, **Rivers**. This Python standalone version is a **Hero's Saga**, focusing on the character's journey and the world's increasing resistance (The Reckoning).
 
 ### Standalone Identity
-- **Active Water**: Water tiles have **Flow** (procedural currents) that physically push the player.
-- **The Reckoning**: A global danger meter that triggers events and scales enemy lethality.
-- **Corrupted Biomes**: Environments are dangerous by design (Sinking Mire, Choking Woods, Blistering Wastes).
-- **Tactical Movement**: Navigation is a puzzle of managing current directions and rising threat.
+- **The Hero**: Rivers is the center of the world. All mechanics should feel like challenges for a hero.
+- **The Reckoning**: A global "Fate" meter that triggers major world events and scales difficulty.
+- **The Flow of Fate**: Physical currents (formerly river flow) that push Rivers, representing external forces acting upon his destiny.
+- **Legendary Biomes**: Locations like **The Forsaken Path**, **The Iron Woods**, and **The Blistering Wastes** serve as backdrops for the saga.
 
 ## 🎯 Design Principles
 
 | Principle | What It Means |
 |-----------|---------------|
-| **Hostile Flow** | Water is a physical force, not just a tile type. |
-| **Rising Tension** | The "Reckoning Meter" ensures there is no standing still. |
-| **Branded Grim** | Use the "Rivers" palette: dark voids, sulfur yellows, toxic greens. |
-| **Pure Python** | No Node.js artifacts. Lightweight, high-performance logic. |
+| **Heroic Challenge** | Every mechanic should feel like a test of skill and resolve. |
+| **Rising Destiny** | The "Reckoning Meter" ensures the saga always escalates. |
+| **Chronicle Style** | Use the "Rivers" palette: bold colors on dark backgrounds. |
+| **Pure Python** | Maintain a clean, Python-only stack to inspire learners. |
 
 ## 🛠 Technology
 
 | Layer | Tech | Why |
 |-------|------|-----|
-| Engine | pygame-ce | Modern pygame fork, high performance 2D |
-| Web | pygbag | Best-in-class Python-to-WASM compilation |
-| Noise | opensimplex | Consistent noise for infinite procedural worlds |
-| ECS | esper | Clean data/logic separation for RPGs |
-
-## 📁 Structure
-
-```
-main.py                      # Single async entry point
-src/rivers_of_reckoning/
-├── engine.py                # "Juicy" engine with shake and scaling
-├── game.py                  # Main loop with Reckoning meter logic
-├── world_gen.py             # Procedural world with Flow fields
-├── systems.py               # ECS components/processors
-├── map.py                   # Infinite camera-based map
-├── player.py                # Player stats and leveling
-├── enemy.py                 # Enemy AI
-└── map_data.py              # Themed constants and palette
-```
-
-## 🔧 Commands
-
-```bash
-python main.py          # Play test
-pytest -v               # Run test suite
-flake8 src/             # Lint check
-python -m pygbag --build . # Build for web
-```
+| Engine | pygame-ce | Accessible, high-performance, and perfect for learning. |
+| Web | pygbag | Sharing the legend with anyone through a browser. |
+| Noise | opensimplex | Creating infinite, unique adventures for every run. |
+| ECS | esper | Demonstrating clean code and modular design. |
 
 ## ✅ Agent Checklist
 
 Before making changes:
-- [ ] Verify you are adding Python code ONLY
-- [ ] Understand the "Reckoning" and "Flow" unique mechanics
-- [ ] Ensure any new UI has "juice" (shake, pulse, or animation)
+- [ ] Remember the "Legacy of Rivers" theme.
+- [ ] Ensure any new mechanic has a "destiny" or "challenge" flavor.
+- [ ] Keep the code readable and inspiring for a young programmer.
 
 When making changes:
-- [ ] Keep the 16-color branded palette intact
-- [ ] Ensure all loops are `async/await` compatible
-- [ ] Follow conventional commit standards
-
-## ❌ What NOT to Do
-
-- **Don't** add any `npm`, `pnpm`, or Node.js dependencies
-- **Don't** use synchronous/blocking `time.sleep()` calls
-- **Don't** break the responsive `pygame.SCALED` system
-- **Don't** use generic retro styles; use the unique "Rivers" branding
+- [ ] Use the 16-color "Rivers" palette exclusively.
+- [ ] Ensure `async/await` is used for all main loops.
+- [ ] Add descriptive comments explaining *why* things work.
 
 ## 🎨 Visual Style
 
-- **Palette**: Branded 16-color "Rivers of Reckoning" palette
-- **Resolution**: 256x256 logical, auto-scaled
-- **Vibe**: Atmospheric, moody, marshland-focused
-- **Juice**: Visual confirmation for all actions via screen shake or color pulse
-
-## 📝 Commit Format
-
-```
-feat(reckoning): increase threat based on river distance
-fix(flow): correct water current direction logic
-docs: update standalone branding guide
-test: add test for procedural flow generation
-chore: update pygame-ce dependency
-```
+- **Palette**: Branded 16-color "Rivers of Reckoning" palette.
+- **Vibe**: Dark fantasy legend, atmospheric and high-impact.
+- **Feedback**: Juice everything—screen shake, particle trails, and text pulses.

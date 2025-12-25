@@ -65,8 +65,10 @@ def test_player_cannot_move_through_walls():
             world_x = m.camera_x + x
             world_y = m.camera_y + y
             # Verify non-walkable tiles are correctly identified
-            if tile in ("#", "T", "R", "o", "X"):
+            if tile in ("#", "T", "R", "X"):
                 assert not m.is_walkable(world_x, world_y)
+            elif tile == "o":
+                assert m.is_walkable(world_x, world_y)  # Water is walkable in this saga
 
 
 # --- Event Effects ---
