@@ -2,7 +2,6 @@ from rivers_of_reckoning.player import Player
 from rivers_of_reckoning.enemy import Enemy
 from rivers_of_reckoning.map import Map
 from rivers_of_reckoning.map_data import ENEMY_TYPES, EVENT_TYPES
-from rivers_of_reckoning.game import Game
 
 
 # --- Player Gear, Gold, Potions, Achievements ---
@@ -153,7 +152,7 @@ def test_game_headless_mode_player_movement_and_events():
                       g.player.gold > 0 or
                       g.enemies_defeated > 0)
         # Ensure that either movement or an event affected the player/game state
-        assert has_moved or has_events
+        assert has_moved or has_events, "Either position or stats should have changed"
         # At minimum we can verify the game state is consistent
         assert g.map is not None
         assert g.player is not None

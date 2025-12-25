@@ -105,7 +105,6 @@ def test_map_walkable():
 # Enemy encounter simulation
 def test_enemy_encounter_damage():
     player = Player("Easy")
-    Enemy(2)
     start_health = player.health
     dmg = 2
     player.take_damage(dmg)
