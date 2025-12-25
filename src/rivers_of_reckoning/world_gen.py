@@ -53,12 +53,12 @@ class BiomeConfig:
     visibility: float        # 0-1 how far player can see
 
 
-# Biome configurations inspired by Otterfall
+# Biome configurations inspired by the theme of Hostile Escalation
 BIOME_CONFIGS = {
     BiomeType.MARSH: BiomeConfig(
-        name="Marsh",
-        base_color=4,    # Brown
-        accent_color=11,  # Light green
+        name="Sinking Mire",
+        base_color=4,    # Mud Brown
+        accent_color=11,  # Poison Ivy
         tree_density=0.1,
         rock_density=0.05,
         water_density=0.3,
@@ -67,9 +67,9 @@ BIOME_CONFIGS = {
         visibility=0.7
     ),
     BiomeType.FOREST: BiomeConfig(
-        name="Forest",
-        base_color=3,    # Dark green
-        accent_color=11,  # Light green
+        name="Choking Woods",
+        base_color=3,    # Moss Green
+        accent_color=11,  # Poison Ivy
         tree_density=0.35,
         rock_density=0.1,
         water_density=0.05,
@@ -78,9 +78,9 @@ BIOME_CONFIGS = {
         visibility=0.5
     ),
     BiomeType.DESERT: BiomeConfig(
-        name="Desert",
-        base_color=10,   # Yellow/sand
-        accent_color=9,   # Orange
+        name="Blistering Wastes",
+        base_color=15,   # Sand
+        accent_color=9,   # Embers
         tree_density=0.02,
         rock_density=0.15,
         water_density=0.01,
@@ -89,9 +89,9 @@ BIOME_CONFIGS = {
         visibility=1.0
     ),
     BiomeType.TUNDRA: BiomeConfig(
-        name="Tundra",
-        base_color=7,    # White
-        accent_color=12,  # Blue
+        name="Frozen Veil",
+        base_color=7,    # Froth White
+        accent_color=12,  # River Blue
         tree_density=0.05,
         rock_density=0.2,
         water_density=0.1,
@@ -100,9 +100,9 @@ BIOME_CONFIGS = {
         visibility=0.8
     ),
     BiomeType.GRASSLAND: BiomeConfig(
-        name="Grassland",
-        base_color=3,    # Green
-        accent_color=10,  # Yellow
+        name="Whispering Plains",
+        base_color=3,    # Moss Green
+        accent_color=10,  # Sulfur
         tree_density=0.08,
         rock_density=0.05,
         water_density=0.02,
@@ -111,9 +111,9 @@ BIOME_CONFIGS = {
         visibility=0.9
     ),
     BiomeType.CAVES: BiomeConfig(
-        name="Caves",
-        base_color=5,    # Dark gray
-        accent_color=13,  # Purple/indigo
+        name="The Depths",
+        base_color=0,    # Deep Void
+        accent_color=13,  # Twilight
         tree_density=0.0,
         rock_density=0.25,
         water_density=0.1,

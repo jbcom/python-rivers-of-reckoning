@@ -2,21 +2,21 @@
 
 > **The Waters are Rising. The Reckoning is Near.**
 
-An immersive, procedurally generated roguelike RPG built exclusively with **Python and pygame-ce**. Featuring infinite world generation, dynamic river flow mechanics, and the unique "Reckoning" threat system.
+An immersive, procedurally generated survival roguelike RPG built exclusively with **Python and pygame-ce**. While other games explore the serenity of the marsh, this is a journey of **Hostile Escalation**.
 
-## 🌊 Unique Standalone Features
+## 🌊 Unique Standalone Identity
 
-*   **Python Powered**: A dedicated Python-only codebase optimized for performance and web deployment via `pygbag`.
-*   **The Reckoning Meter**: A unique threat system where the world becomes progressively more dangerous the longer you survive and the further you explore.
-*   **Adaptive River Flow**: Procedural water currents that physically pull your character, adding a unique tactical layer to exploration and combat.
-*   **Juicy Retro Aesthetic**: Branded 16-color "Rivers" palette with screen shake, animated UI, and responsive scaling.
-*   **Infinite Procedural Rivers**: Explore an endless, coherent world generated using layered OpenSimplex noise (FBM).
+*   **The Reckoning Meter**: A unique global threat system. As you explore and survive, the world itself becomes more hostile, triggering major "Surge" events that physically reshape your struggle.
+*   **Adaptive River Flow**: Water isn't just a tile; it's a force. Procedural currents physically pull your character and enemies, requiring tactical navigation to "surf" or "fight" the flow.
+*   **Hostile Biomes**: Explore the **Sinking Mire**, **Choking Woods**, and **Blistering Wastes**—environments designed to actively resist your presence.
+*   **Grim Retro Juice**: A high-contrast "Rivers" palette (Sulfur, Poison, Blood) combined with aggressive screen shake and impactful combat feedback.
+*   **Pure Python**: Optimized for peak performance via `pygame-ce` and seamless web play via `pygbag` WASM.
 
 ## 🎮 Core Gameplay
 
-*   **Exploration**: Discover shifting biomes (Marsh, Forest, Desert, Tundra, Grassland) each with unique flow and spawn rates.
-*   **Survival**: Manage your health and mana while navigating rising tides and lethal enemy encounters.
-*   **Reckoning**: Balance the reward of deep exploration against the rising difficulty of the Reckoning.
+*   **Tactical Navigation**: Use the river's flow to move faster or avoid enemies, but beware of being pulled into hazards.
+*   **Rising Threat**: Monitor the Reckoning Meter. Every step forward increases the world's anger.
+*   **Survival Roguelike**: Perma-death challenge where you must balance exploration rewards against the inevitable escalation of the Reckoning.
 
 ## 🛠️ Installation
 
@@ -30,11 +30,8 @@ An immersive, procedurally generated roguelike RPG built exclusively with **Pyth
 # Using pip
 pip install pygame-ce opensimplex esper
 
-# For development (includes testing tools)
+# For development
 pip install -e ".[dev]"
-
-# For web deployment
-pip install -e ".[web]"
 ```
 
 ## 🎮 Running the Game
@@ -51,163 +48,35 @@ python main.py
 
 ### Web
 
-The game is automatically deployed to GitHub Pages via pygbag when changes are pushed to main.
-
 To build locally for web:
 
 ```bash
 pip install pygbag
-python -m pygbag --build build/web .
+python -m pygbag --build .
 ```
 
-## 🌍 Procedural Generation
+## 🌍 Procedural Systems
 
-The game uses advanced procedural generation techniques inspired by modern game engines:
-
-### Noise-Based Terrain
-
-- **OpenSimplex Noise**: Multiple octaves of noise (FBM - Fractal Brownian Motion) for natural terrain
-- **Biome Generation**: Temperature and moisture maps determine biome placement
-- **Deterministic Seeds**: Each seed generates a unique but reproducible world
-
-### Biome System
-
-| Biome     | Temperature | Moisture | Characteristics |
-|-----------|-------------|----------|-----------------|
-| Marsh     | Moderate    | High     | Water-heavy, moderate enemies |
-| Forest    | Moderate    | Medium   | Dense trees, medium visibility |
-| Desert    | High        | Low      | Open terrain, high stamina drain |
-| Tundra    | Low         | Any      | Cold, slower movement |
-| Grassland | Moderate    | Low      | Open plains, fast travel |
-
-### ECS Architecture
-
-The game uses the `esper` Entity Component System:
-
-- **Components**: Pure data (Position, Velocity, Health, Combat, etc.)
-- **Processors**: Game logic systems (Movement, AI, Weather, Time, etc.)
-- **Entities**: Composable game objects
-
-## 🎮 Controls
-
-- **Arrow Keys**: Move player through the infinite world
-- **ENTER**: Start game from title screen
-- **ESC**: Pause / Resume / Quit
-- **Q**: Quit to menu (when paused)
-
-### Boss Battles
-
-- **A**: Attack
-- **S**: Cast spell
-- **ESC**: Flee from battle
+*   **FBM Noise Terrain**: Infinite, coherent world generation.
+*   **Whittaker Biomes**: Shifting environments based on moisture/temp.
+*   **Flow Fields**: Directional water currents derived from moisture noise.
+*   **ECS Architecture**: Clean separation of data and logic using `esper`.
 
 ## 📁 Project Structure
 
 ```
-├── src/
-│   └── rivers_of_reckoning/
-│       ├── __init__.py          # Package initialization
-│       ├── cli.py               # CLI entry point
-│       ├── engine.py            # Pygame-ce abstraction layer
-│       ├── game.py              # Main game class
-│       ├── player.py            # Player logic
-│       ├── enemy.py             # Enemy logic
-│       ├── map.py               # Map system (camera-based viewport)
-│       ├── map_data.py          # Game data and constants
-│       ├── world_gen.py         # Procedural world generation
-│       ├── systems.py           # ECS components and processors
-│       ├── boss.py              # Boss encounters
-│       ├── shop.py              # Shop system
-│       ├── procedural_enemies.py # Procedural enemy generation
-│       └── utils.py             # Utility functions
-├── main.py                      # Desktop entry point
-├── main_web.py                  # Web (pygbag) entry point
-├── pyproject.toml               # Project configuration (Hatch)
-└── README.md                    # This file
+├── main.py                      # THE entry point (async, pygbag-ready)
+├── src/rivers_of_reckoning/
+│   ├── engine.py                # Responsive pygame with juice & scaling
+│   ├── game.py                  # Main loop & Reckoning mechanics
+│   ├── world_gen.py             # Procedural biomes & Flow fields
+│   ├── systems.py               # ECS components & processors
+│   ├── map.py                   # Infinite scrolling camera
+│   ├── player.py                # Mechanics & stats
+│   ├── enemy.py                 # AI & spawning
+│   └── map_data.py              # Branded palette & constants
+└── tests/                       # Python test suite
 ```
-
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run specific test file
-pytest test_game_logic.py
-
-# Run with verbose output
-pytest -v
-```
-
-### Test Coverage
-
-- ✅ Library structure and imports
-- ✅ Player movement (infinite world + legacy wrap modes)
-- ✅ Procedural map generation with different seeds
-- ✅ Biome walkability rules
-- ✅ Game state transitions
-- ✅ Enemy encounters and events
-
-## 🔧 Development
-
-### Package Installation
-
-```bash
-# Install in development mode
-pip install -e ".[dev]"
-
-# Build package
-python -m build
-
-# Install from source
-pip install -e .
-```
-
-### Architecture Highlights
-
-- **Infinite World**: Camera-based viewport following the player through procedural terrain
-- **Noise Generators**: Instance-based OpenSimplex noise for reproducible worlds
-- **Tile Caching**: Efficient caching of generated tiles for performance
-- **ECS Design**: Clean separation of data (components) and logic (processors)
-
-## 🌐 Web Deployment
-
-The game deploys to GitHub Pages using pygbag:
-
-1. Push to main branch triggers the web-deployment workflow
-2. pygbag compiles Python to WebAssembly
-3. Static site is deployed to GitHub Pages
-
-### Render.com Deployment
-
-A `render.yaml` blueprint is provided for Render.com static site hosting.
-
-## 📈 Technical Details
-
-### Technology Stack
-
-- **pygame-ce**: Modern fork of pygame for cross-platform 2D games
-- **opensimplex**: Fast noise generation for procedural content
-- **esper**: Lightweight Entity Component System
-- **pygbag**: Python to WebAssembly compiler for browser deployment
-- **Hatch**: Modern Python project management
-
-### Game Engine Features
-
-- **Resolution**: 960x960 pixel display (scaled from 256x256 logical)
-- **Color Palette**: 16-color retro aesthetic
-- **Performance**: 60 FPS target with async support
-- **World Size**: Infinite (procedurally generated on-demand)
-
-### Procedural Generation Techniques
-
-Inspired by advanced game rendering techniques:
-
-- **FBM (Fractal Brownian Motion)**: Layered noise for natural terrain
-- **Biome Classification**: Whittaker-style temperature/moisture mapping
-- **Deterministic Generation**: Same seed = same world
 
 ## 📄 License
 
@@ -215,11 +84,10 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🙏 Acknowledgments
 
-- **pygame-ce Community**: For maintaining the excellent pygame fork
-- **pygbag**: For enabling Python games in the browser
-- **Otterfall**: Inspiration for ECS architecture and procedural generation
-- **Contributors**: All contributors to the project
+- **pygame-ce Community**: For the high-performance framework.
+- **pygbag**: For bringing Python to the web.
+- **Otterfall**: Inspiration for procedural ECS design.
 
 ---
 
-**Ready to explore an infinite world?** Run: `python main.py`
+**"The further you go, the heavier the Reckoning."** Run: `python main.py`

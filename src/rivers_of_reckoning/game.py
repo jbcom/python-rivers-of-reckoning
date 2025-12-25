@@ -154,11 +154,11 @@ class Game:
 
         # Features list with themed icons
         features = [
-            "~ Infinite Procedural Rivers",
-            "~ Dynamic Biome Shifts",
-            "~ The Reckoning Meter",
-            "~ Adaptive Water Flow",
-            "~ Perma-death Challenge",
+            "~ Hostile River Currents",
+            "~ Sinking Mire & Choking Woods",
+            "~ The Global Reckoning Meter",
+            "~ Tactical Flow Navigation",
+            "~ Perma-death Survival",
         ]
         for i, feature in enumerate(features):
             col = 11 if (self.title_frame // 30) % len(features) == i else 3
@@ -210,10 +210,14 @@ class Game:
             self.state = "paused"
             return
 
-        # Update Reckoning: slowly increases over time
+        # Update Reckoning: slowly increases over time and distance
         self.reckoning_timer += 1
         if self.reckoning_timer % 60 == 0:
             self.reckoning_level += 1
+            
+            # Check for Reckoning Surge (every 100 levels)
+            if self.reckoning_level > 0 and self.reckoning_level % 100 == 0:
+                self._trigger_reckoning_surge()
 
         # Update ECS systems
         if self.ecs_world:
@@ -278,6 +282,26 @@ class Game:
 
             if self.player.health <= 0:
                 self.state = "gameover"
+
+    def _trigger_reckoning_surge(self):
+        """A major event where the world actively strikes back"""
+        if self.engine:
+            self.engine.shake(10, 60)  # Violent shake
+        
+        surge_types = [
+            "THE WATERS RISE!",
+            "THE EARTH RECKONS!",
+            "THE FOG THICKENS!",
+            "A SURGE OF ANGER!",
+        ]
+        msg = random.choice(surge_types)
+        self.event_message = f"!!! {msg} !!!"
+        self.event_timer = EVENT_MESSAGE_DURATION * 2
+        
+        # Immediate consequence
+        penalty = 5 + (self.reckoning_level // 200)
+        self.player.take_damage(penalty)
+        self.enemies_defeated += 5  # "Ghost" enemies defeated by the surge
 
     def _trigger_random_event(self):
         """Trigger a random event based on current biome"""

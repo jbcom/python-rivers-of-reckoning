@@ -1,24 +1,25 @@
 # AGENTS.md - Rivers of Reckoning [PYTHON STANDALONE]
 
-> **Instructions for AI agents working on this dedicated Python-only procedural RPG**
+> **Instructions for AI agents working on this hostile survival procedural RPG**
 
-## 🌊 Standalone Identity
+## 🌊 The Core Message: "The Toll of the Journey"
 
-**Rivers of Reckoning** is a browser-based roguelike RPG built exclusively with Python. It is a **standalone codebase** with its own branding, mechanics (River Flow, Reckoning Meter), and visual style.
+Unlike traditional RPGs or the serene exploration of "Rivermarsh", **Rivers of Reckoning** is about **hostile escalation**. Every action and every step forward increases the **Reckoning**—the world's active resistance to your presence.
 
-### Mission Statement
-
-*Create a special, standout Python experience that leverages the unique strengths of pygame-ce and procedural generation.*
+### Standalone Identity
+- **Active Water**: Water tiles have **Flow** (procedural currents) that physically push the player.
+- **The Reckoning**: A global danger meter that triggers events and scales enemy lethality.
+- **Corrupted Biomes**: Environments are dangerous by design (Sinking Mire, Choking Woods, Blistering Wastes).
+- **Tactical Movement**: Navigation is a puzzle of managing current directions and rising threat.
 
 ## 🎯 Design Principles
 
 | Principle | What It Means |
 |-----------|---------------|
-| **Python-Only** | Solely use Python dependencies. No TS/JS integration. |
-| **River Flow** | Procedural water current mechanics are core to movement. |
-| **The Reckoning** | A rising threat meter that scales world difficulty. |
-| **Juicy Retro** | SATISFYING feedback: screen shake, animated UI, branded palette. |
-| **Web-First** | Optimzed for `pygbag` WASM deployment. |
+| **Hostile Flow** | Water is a physical force, not just a tile type. |
+| **Rising Tension** | The "Reckoning Meter" ensures there is no standing still. |
+| **Branded Grim** | Use the "Rivers" palette: dark voids, sulfur yellows, toxic greens. |
+| **Pure Python** | No Node.js artifacts. Lightweight, high-performance logic. |
 
 ## 🛠 Technology
 

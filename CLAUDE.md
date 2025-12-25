@@ -1,18 +1,23 @@
 # CLAUDE.md - Rivers of Reckoning [PYTHON STANDALONE]
 
-> **An immersive, procedurally generated roguelike RPG built exclusively for Python web play**
+> **"The further you explore, the heavier the Reckoning."**
 
-## 🌊 The Standalone Vision
+## 🌊 The Standalone Vision: Hostile Escalation
 
-**Rivers of Reckoning** is a browser-based adventure where players explore an infinite, ever-changing world of marshes, forests, deserts, and tundra. This is a **pure Python implementation** designed to stand apart from TypeScript alternatives through unique mechanics and a deep retro aesthetic.
+**Rivers of Reckoning** is NOT just a marsh exploration game. It is an **atmospheric survival roguelike** where the world itself is a living antagonist. While other games focus on the serenity of nature, this game focuses on the **Hostility of the Flow** and the **Inevitability of the Reckoning**.
+
+### How we differ from "Rivermarsh" (TS):
+1.  **Hostile Environment**: The water doesn't just sit there; it **pulls** you. River Flow is a tactical obstacle.
+2.  **The Reckoning Meter**: A unique mechanic where your very existence in the world increases its hostility. There is no safe "grinding"—only moving forward against a rising tide of danger.
+3.  **Grim Aesthetic**: A "Corrupted Nature" style using a custom high-contrast palette (Sulfur, Poison Ivy, Blood Marsh).
+4.  **Tactile Survival**: Focus on the physical struggle of movement against currents and the management of "Reckoning" events.
 
 ### Unique Standalone Goals
 
-1. **The Reckoning**: A persistent threat system unique to this version.
-2. **Adaptive Flow**: Procedural water currents that influence movement.
-3. **Python Optimized**: Leveraging `pygame-ce` and `pygbag` for peak performance.
-4. **Retro Juice**: Screen shake, particle-based animations, and a branded 16-color palette.
-5. **Instant Play**: Click and you're in. Zero setup via `pygbag` WASM.
+1.  **The Reckoning**: A threat system that triggers environmental "judgments" (surges, swarms).
+2.  **Adaptive Flow**: Procedural currents that require the player to "surf" or "fight" the river.
+3.  **Hostile Biomes**: Renamed and redesigned to feel like places that want you gone (Sinking Mire, Choking Woods).
+4.  **Retro Juice**: High-feedback combat with screen shake and "impact" frames.
 
 ### The World
 
