@@ -20,14 +20,14 @@ jobs:
     steps:
       - name: Get issue details
         id: issue
+        env:
+          LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+          TITLE: ${{ github.event.issue.title }}
         run: |
           echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
           echo "title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
           
           # Determine project based on labels and title
-          LABELS="${{ join(github.event.issue.labels.*.name, ',') }}"
-          TITLE="${{ github.event.issue.title }}"
-          
           ADD_INTEGRATION=false
           ADD_ROADMAP=false
           
