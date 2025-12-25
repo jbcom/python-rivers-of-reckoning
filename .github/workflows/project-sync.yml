@@ -13,11 +13,6 @@ on:
 permissions:
   issues: read
 
-env:
-  # Project IDs from jbcom organization
-  INTEGRATION_PROJECT_ID: "PVT_kwHOAChyN84BJLOn"
-  ROADMAP_PROJECT_ID: "PVT_kwHOAChyN84BKeDX"
-
 jobs:
   add-to-project:
     name: Add to Projects
@@ -69,7 +64,7 @@ jobs:
         if: steps.issue.outputs.add_integration == 'true'
         uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e
         with:
-          project-url: https://github.com/orgs/jbcom/projects/2
+          project-url: ${{ secrets.INTEGRATION_PROJECT_URL }}
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}
 
       # actions/add-to-project v1.0.2
@@ -77,5 +72,5 @@ jobs:
         if: steps.issue.outputs.add_roadmap == 'true'
         uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e
         with:
-          project-url: https://github.com/orgs/jbcom/projects/8
+          project-url: ${{ secrets.ROADMAP_PROJECT_URL }}
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}

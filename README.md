@@ -37,7 +37,7 @@ pip install -e ".[web]"
 
 ```bash
 # Using the CLI
-first-python-rpg
+rivers-of-reckoning
 
 # Or using Python
 python main.py
@@ -99,7 +99,7 @@ The game uses the `esper` Entity Component System:
 
 ```
 ├── src/
-│   └── first_python_rpg/
+│   └── rivers_of_reckoning/
 │       ├── __init__.py          # Package initialization
 │       ├── cli.py               # CLI entry point
 │       ├── engine.py            # Pygame-ce abstraction layer

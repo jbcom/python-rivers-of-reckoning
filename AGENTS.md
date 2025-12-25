@@ -41,7 +41,7 @@
 
 ```
 main.py                      # Single async entry point
-src/first_python_rpg/
+src/rivers_of_reckoning/
 ├── engine.py                # Responsive auto-scaling engine
 ├── game.py                  # Game loop and state machine
 ├── world_gen.py             # Procedural generation

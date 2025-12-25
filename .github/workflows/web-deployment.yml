@@ -25,7 +25,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
       with:
-        python-version: "3.12"
+        python-version: "3.10"
 
     - name: Install system dependencies
       run: |
@@ -39,12 +39,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install --system pygame-ce pygbag
+        uv pip install --system pygame-ce pygbag esper opensimplex
         uv pip install --system -e .
 
     - name: Build with pygbag
       run: |
-        pygbag --build main.py
+        python -m pygbag --build .
         # pygbag outputs to build/web
 
     - name: Setup Pages

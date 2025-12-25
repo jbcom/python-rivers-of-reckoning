@@ -7,7 +7,7 @@ def test_sprite_functions():
     print("Testing sprite procedural generation...")
 
     try:
-        from first_python_rpg.map_data import SPRITES, BOSS_SPRITES
+        from rivers_of_reckoning.map_data import SPRITES, BOSS_SPRITES
 
         # Test regular sprites
         sprite_count = len(SPRITES)
@@ -42,6 +42,7 @@ def test_sprite_functions():
                 return False
 
         print("✓ All sprite functions are working correctly")
+        return True
 
     except Exception as e:
         print(f"✗ Sprite test failed: {e}")
@@ -54,17 +55,17 @@ def test_game_components():
 
     try:
         # Test game import
-        from first_python_rpg.game import Game
+        from rivers_of_reckoning.game import Game
 
         print("✓ Game class imported successfully")
 
         # Test map import
-        from first_python_rpg.map import Map
+        from rivers_of_reckoning.map import Map
 
         print("✓ Map class imported successfully")
 
         # Test boss import
-        from first_python_rpg.boss import (
+        from rivers_of_reckoning.boss import (
             boss_battle,
             update_boss_battle,
             draw_boss_battle,

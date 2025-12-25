@@ -1,8 +1,7 @@
-import pytest
-from first_python_rpg.player import Player
-from first_python_rpg.enemy import Enemy
-from first_python_rpg.map import Map
-from first_python_rpg.map_data import MAP_SIZE, DIFFICULTY_LEVELS, ENEMY_TYPES
+from rivers_of_reckoning.player import Player
+from rivers_of_reckoning.enemy import Enemy
+from rivers_of_reckoning.map import Map
+from rivers_of_reckoning.map_data import MAP_SIZE, DIFFICULTY_LEVELS, ENEMY_TYPES
 
 
 # Player movement logic
@@ -106,7 +105,7 @@ def test_map_walkable():
 # Enemy encounter simulation
 def test_enemy_encounter_damage():
     player = Player("Easy")
-    enemy = Enemy(2)
+    Enemy(2)
     start_health = player.health
     dmg = 2
     player.take_damage(dmg)

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "first-python-rpg"
+name = "rivers-of-reckoning"
 version = "0.5.0"
 description = "Rivers of Reckoning - A fully procedural RPG with infinite world generation, ECS architecture, dynamic biomes, and web deployment via pygbag."
 readme = "README.md"
@@ -44,10 +44,10 @@ web = [
 ]
 
 [project.scripts]
-first-python-rpg = "first_python_rpg.cli:main"
+rivers-of-reckoning = "rivers_of_reckoning.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/first_python_rpg"]
+packages = ["src/rivers_of_reckoning"]
 
 [tool.hatch.build.targets.sdist]
 include = [

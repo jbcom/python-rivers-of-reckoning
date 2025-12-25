@@ -12,7 +12,7 @@ import asyncio
 async def main():
     """Async main function for pygbag compatibility."""
     # Import here to ensure pygame initializes in async context
-    from first_python_rpg.game import Game
+    from rivers_of_reckoning.game import Game
 
     game = Game()
 

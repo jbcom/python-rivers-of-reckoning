@@ -4,14 +4,14 @@
 
 def test_library_import():
     """Test that we can import the library modules"""
-    from first_python_rpg import Game, Player, Enemy
+    from rivers_of_reckoning import Game, Player, Enemy
 
     print("✓ Core library imports successful")
 
     # Test individual module imports
-    from first_python_rpg.map import Map
-    from first_python_rpg.map_data import MAP_SIZE, ENEMY_TYPES
-    from first_python_rpg.procedural_enemies import ProceduralEnemyGenerator
+    from rivers_of_reckoning.map import Map
+    from rivers_of_reckoning.map_data import MAP_SIZE, ENEMY_TYPES
+    from rivers_of_reckoning.procedural_enemies import ProceduralEnemyGenerator
 
     print("✓ All module imports successful")
 
@@ -27,9 +27,9 @@ def test_library_import():
 
 def test_basic_functionality():
     """Test basic game object creation"""
-    from first_python_rpg import Player, Enemy
-    from first_python_rpg.map import Map
-    from first_python_rpg.procedural_enemies import ProceduralEnemyGenerator
+    from rivers_of_reckoning import Player, Enemy
+    from rivers_of_reckoning.map import Map
+    from rivers_of_reckoning.procedural_enemies import ProceduralEnemyGenerator
 
     # Test object creation
     player = Player()
@@ -53,7 +53,7 @@ def test_basic_functionality():
 
 def test_game_creation():
     """Test that we can create a game instance."""
-    from first_python_rpg import Game
+    from rivers_of_reckoning import Game
 
     print("✓ Game class can be imported")
     assert Game is not None

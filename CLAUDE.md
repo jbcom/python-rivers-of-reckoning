@@ -45,7 +45,7 @@ esper         → ECS architecture for clean game logic
 
 ```
 main.py                      # THE entry point (async, pygbag-ready)
-src/first_python_rpg/
+src/rivers_of_reckoning/
 ├── engine.py                # Responsive pygame with auto-scaling
 ├── game.py                  # Game states, update/draw loops
 ├── world_gen.py             # Procedural biomes via noise

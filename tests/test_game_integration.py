@@ -1,9 +1,8 @@
-import pytest
-from first_python_rpg.player import Player
-from first_python_rpg.enemy import Enemy
-from first_python_rpg.map import Map
-from first_python_rpg.map_data import MAP_SIZE, DIFFICULTY_LEVELS, ENEMY_TYPES, EVENT_TYPES
-from first_python_rpg.game import Game
+from rivers_of_reckoning.player import Player
+from rivers_of_reckoning.enemy import Enemy
+from rivers_of_reckoning.map import Map
+from rivers_of_reckoning.map_data import MAP_SIZE, ENEMY_TYPES, EVENT_TYPES
+from rivers_of_reckoning.game import Game
 
 
 # --- Player Gear, Gold, Potions, Achievements ---
@@ -59,7 +58,6 @@ def test_procedural_map_variety():
 def test_player_cannot_move_through_walls():
     """Test that non-walkable tiles block movement."""
     m = Map(seed=42)
-    player = Player("Easy")
     # Check some tiles in the visible grid
     for y in range(m.size):
         for x in range(m.size):
@@ -92,7 +90,7 @@ def test_player_gameover_condition():
 # --- Procedural Game Simulation ---
 def test_procedural_game_simulation():
     """Test that game starts with fully procedural generation."""
-    from first_python_rpg.game import Game
+    from rivers_of_reckoning.game import Game
 
     g = Game(test_mode=True)
     g.start_game()
