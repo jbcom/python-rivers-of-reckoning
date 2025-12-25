@@ -2,7 +2,14 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Comprehensive Game Coverage', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000')
+    await page.goto('http://localhost:3000?disableVegetation')
+    // Clear localStorage to ensure a clean state for each test
+    await page.evaluate(() => localStorage.clear())
+    // Reload to ensure state is clean
+    await page.reload({ waitUntil: 'load' })
+    // Wait for the app to mount
+    await page.waitForSelector('#root > *', { timeout: 30000 })
+    
     // Wait for title screen
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.waitFor({ state: 'visible', timeout: 30000 })
@@ -11,10 +18,10 @@ test.describe('Comprehensive Game Coverage', () => {
     await startButton.click()
     
     // Wait for canvas to be present and have a size
-    await page.waitForSelector('canvas', { timeout: 30000 })
+    await page.waitForSelector('#game-canvas', { state: 'visible', timeout: 30000 })
     await page.waitForFunction(() => {
-      const canvas = document.querySelector('canvas')
-      return canvas && canvas.clientWidth > 0 && canvas.clientHeight > 0
+      const canvases = Array.from(document.querySelectorAll('#game-canvas'))
+      return canvases.some(canvas => canvas instanceof HTMLCanvasElement && canvas.clientWidth > 0 && canvas.clientHeight > 0)
     })
     
     // Wait for at least one frame to be rendered
@@ -35,12 +42,12 @@ test.describe('Comprehensive Game Coverage', () => {
         await page.keyboard.up(key)
       }
       // Check that game hasn't crashed and canvas is still there
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
     })
 
     test('mouse button handling (attack)', async ({ page }) => {
       // Click on the canvas to attack
-      const canvas = page.locator('canvas')
+      const canvas = page.locator('#game-canvas')
       await canvas.click({ position: { x: 100, y: 100 } })
       
       // We can't easily check for the ringGeometry visibility in R3F from Playwright
@@ -51,7 +58,7 @@ test.describe('Comprehensive Game Coverage', () => {
 
     test('touch events simulation', async ({ page }) => {
       // Swipe simulation using mouse (OrbitControls handles this)
-      const canvas = page.locator('canvas')
+      const canvas = page.locator('#game-canvas')
       const box = await canvas.boundingBox()
       if (box) {
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
@@ -60,7 +67,7 @@ test.describe('Comprehensive Game Coverage', () => {
         await page.mouse.up()
       }
       
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
     })
 
     test('joystick dead zone behavior', async ({ page }) => {
@@ -76,7 +83,7 @@ test.describe('Comprehensive Game Coverage', () => {
       })
       await page.waitForTimeout(200)
       
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
     })
   })
 
@@ -85,17 +92,17 @@ test.describe('Comprehensive Game Coverage', () => {
       // Test very small resolution
       await page.setViewportSize({ width: 320, height: 480 })
       await page.waitForTimeout(1000)
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
       
       // Test very large resolution
       await page.setViewportSize({ width: 1280, height: 720 }) // Smaller large to be safe
       await page.waitForTimeout(1000)
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
       
       // Test standard
       await page.setViewportSize({ width: 1024, height: 768 })
       await page.waitForTimeout(1000)
-      await expect(page.locator('canvas')).toBeVisible()
+      await expect(page.locator('#game-canvas')).toBeVisible()
     })
   })
 

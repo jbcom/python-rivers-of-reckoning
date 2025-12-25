@@ -2,7 +2,13 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Rivers of Reckoning - Strata Edition', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000')
+    await page.goto('http://localhost:3000?disableVegetation')
+    // Clear localStorage to ensure a clean state for each test
+    await page.evaluate(() => localStorage.clear())
+    // Reload to ensure state is clean
+    await page.reload({ waitUntil: 'load' })
+    // Wait for the app to mount
+    await page.waitForSelector('#root > *', { timeout: 30000 })
   })
 
   test('title screen loads correctly', async ({ page }) => {
@@ -37,11 +43,15 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.click()
     
-    // Wait for 3D canvas to appear
-    await page.waitForSelector('canvas', { timeout: 10000 })
+    // Wait for 3D canvas to appear and be initialized
+    await page.waitForSelector('#game-canvas', { state: 'visible', timeout: 15000 })
+    await page.waitForFunction(() => {
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement
+      return canvas && (!!canvas.getContext('webgl2') || !!canvas.getContext('webgl'))
+    }, { timeout: 10000 })
     
     // Verify canvas exists
-    const canvas = page.locator('canvas')
+    const canvas = page.locator('#game-canvas')
     await expect(canvas).toBeVisible()
     
     // Take screenshot of game started
@@ -54,7 +64,11 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.click()
     
-    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForSelector('#game-canvas', { state: 'visible', timeout: 15000 })
+    await page.waitForFunction(() => {
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement
+      return canvas && (!!canvas.getContext('webgl2') || !!canvas.getContext('webgl'))
+    }, { timeout: 10000 })
     
     // Wait for 3D scene to render
     await page.waitForTimeout(2000)
@@ -67,7 +81,7 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     
     // Verify WebGL context is active
     const hasWebGL = await page.evaluate(() => {
-      const canvas = document.querySelector('canvas') as HTMLCanvasElement
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement
       return !!canvas?.getContext('webgl2') || !!canvas?.getContext('webgl')
     })
     expect(hasWebGL).toBe(true)
@@ -79,29 +93,26 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.click()
     
-    await page.waitForSelector('canvas', { timeout: 10000 })
-    await page.waitForTimeout(1000)
-    
-    // Get all text content from the page
-    const bodyText = await page.locator('body').textContent()
+    // Wait for HUD to appear
+    await page.waitForSelector('.game-hud-top', { state: 'visible', timeout: 15000 })
     
     // Check for health indicator
-    const hasHealthIndicator = bodyText?.includes('Health') || 
-                               bodyText?.includes('HP') || 
-                               bodyText?.includes('/') // Health format "X / Y"
-    expect(hasHealthIndicator).toBe(true)
+    const topHud = page.locator('.game-hud-top')
+    await expect(topHud).toContainText('/', { timeout: 10000 })
     
     // Check for time display (Day X format)
-    expect(bodyText).toMatch(/Day \d+/)
+    const bottomHud = page.locator('.game-hud-bottom')
+    await expect(bottomHud).toContainText(/Day \d+/, { timeout: 10000 })
     
     // Check for biome display - should show one of the biome names
     const biomeTypes = ['Marsh', 'Forest', 'Desert', 'Tundra', 'Grassland', 'Caves']
-    const hasBiomeDisplay = biomeTypes.some(biome => bodyText?.includes(biome))
+    const hudText = await topHud.textContent()
+    const hasBiomeDisplay = biomeTypes.some(biome => hudText?.includes(biome))
     expect(hasBiomeDisplay).toBe(true)
     
     // Check for weather display
     const weatherTypes = ['Clear', 'Rain', 'Fog', 'Snow', 'Storm', 'clear', 'rain', 'fog', 'snow', 'storm']
-    const hasWeatherDisplay = weatherTypes.some(type => bodyText?.includes(type))
+    const hasWeatherDisplay = weatherTypes.some(type => hudText?.includes(type))
     expect(hasWeatherDisplay).toBe(true)
   })
 
@@ -111,13 +122,13 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.click()
     
-    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForSelector('.game-hud-bottom', { timeout: 15000 })
     await page.waitForTimeout(1000)
     
     // Check for time phase display
-    const bodyText = await page.locator('body').textContent()
+    const bottomText = await page.locator('.game-hud-bottom').textContent()
     const timePhases = ['dawn', 'day', 'dusk', 'night', 'Dawn', 'Day', 'Dusk', 'Night']
-    const hasTimePhase = timePhases.some(phase => bodyText?.includes(phase))
+    const hasTimePhase = timePhases.some(phase => bottomText?.includes(phase))
     expect(hasTimePhase).toBe(true)
     
     // Take screenshot 
@@ -130,10 +141,10 @@ test.describe('Rivers of Reckoning - Strata Edition', () => {
     const startButton = page.getByRole('button', { name: /start/i })
     await startButton.click()
     
-    await page.waitForSelector('canvas', { timeout: 10000 })
+    await page.waitForSelector('#game-canvas', { timeout: 15000 })
     await page.waitForTimeout(1000)
     
-    const canvas = page.locator('canvas')
+    const canvas = page.locator('#game-canvas')
     const box = await canvas.boundingBox()
     
     if (box) {

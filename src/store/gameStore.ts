@@ -467,6 +467,7 @@ export const useGameStore = create<GameStore>()(
           worldState: state.worldState,
           playerStats: state.playerStats,
           playerHealth: state.playerHealth,
+          playerPosition: state.playerPosition,
         }),
       }
     )

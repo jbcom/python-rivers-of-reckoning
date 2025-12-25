@@ -35,20 +35,15 @@ const WeatherIcon = ({ weather }: { weather: WeatherType }) => {
 }
 
 export function GameHUD() {
-  const {
-    playerHealth,
-    playerStamina,
-    playerStats,
-    playerPosition,
-    timeOfDay,
-    weather,
-    worldState,
-    pauseGame,
-  } = useGameStore()
-
-  const biomeConfig = BIOME_CONFIGS[worldState.currentBiome]
-  const healthPercent = (playerHealth.current / playerHealth.maximum) * 100
-  const staminaPercent = (playerStamina.current / playerStamina.maximum) * 100
+  const playerHealth = useGameStore(state => state.playerHealth)
+  const playerStamina = useGameStore(state => state.playerStamina)
+  const playerStats = useGameStore(state => state.playerStats)
+  const playerPosition = useGameStore(state => state.playerPosition)
+  const timeOfDay = useGameStore(state => state.timeOfDay)
+  const weather = useGameStore(state => state.weather)
+  const worldState = useGameStore(state => state.worldState)
+  const pauseGame = useGameStore(state => state.pauseGame)
+  const isInGame = useGameStore(state => state.isInGame)
 
   // Handle ESC key
   useEffect(() => {
@@ -61,10 +56,17 @@ export function GameHUD() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [pauseGame])
 
+  if (!isInGame) return null
+
+  const biomeConfig = BIOME_CONFIGS[worldState.currentBiome]
+  const healthPercent = (playerHealth.current / playerHealth.maximum) * 100
+  const staminaPercent = (playerStamina.current / playerStamina.maximum) * 100
+
   return (
     <>
       {/* Top HUD Bar */}
       <div
+        className="game-hud-top"
         style={{
           position: 'fixed',
           top: 0,
@@ -76,7 +78,7 @@ export function GameHUD() {
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           pointerEvents: 'none',
-          zIndex: 100,
+          zIndex: 5000,
         }}
       >
         {/* Left: Health & Stamina */}
@@ -163,6 +165,7 @@ export function GameHUD() {
 
       {/* Bottom HUD Bar */}
       <div
+        className="game-hud-bottom"
         style={{
           position: 'fixed',
           bottom: 0,
@@ -174,7 +177,7 @@ export function GameHUD() {
           justifyContent: 'space-between',
           alignItems: 'center',
           pointerEvents: 'none',
-          zIndex: 100,
+          zIndex: 5000,
         }}
       >
         {/* Coordinates */}

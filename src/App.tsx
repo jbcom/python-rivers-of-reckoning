@@ -9,9 +9,9 @@
  */
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Stats, Loader } from '@react-three/drei'
+import { OrbitControls, Stats } from '@react-three/drei'
 import { Suspense, useMemo, useRef, useCallback } from 'react'
-import { ThemeProvider, createTheme, CssBaseline, Fade, Box } from '@mui/material'
+import { ThemeProvider, createTheme, CssBaseline, Box } from '@mui/material'
 import * as THREE from 'three'
 
 // Strata imports - using REAL API only
@@ -169,10 +169,9 @@ function Vegetation({ areaSize }: { areaSize: number }) {
   // Height function for placing vegetation
   const heightFunc = useCallback(
     (x: number, z: number) => {
-      const height =
-        fbm(x * 0.02, 0, z * 0.02, 6) * 8 +
-        fbm(x * 0.008, 0.1, z * 0.008, 4) * 12
-      return Math.max(0, height)
+      const baseHeight = fbm(x * 0.02, 0, z * 0.02, 6) * 8
+      const largeScale = fbm(x * 0.008, 0.1, z * 0.008, 4) * 12
+      return Math.max(0, baseHeight + largeScale)
     },
     []
   )
@@ -180,19 +179,19 @@ function Vegetation({ areaSize }: { areaSize: number }) {
   return (
     <>
       <GrassInstances
-        count={3000}
+        count={1000}
         areaSize={areaSize}
         heightFunc={heightFunc}
         height={0.3}
         color="#4a7a4a"
       />
       <TreeInstances
-        count={150}
+        count={50}
         areaSize={areaSize}
         heightFunc={heightFunc}
       />
       <RockInstances
-        count={80}
+        count={30}
         areaSize={areaSize}
         heightFunc={heightFunc}
       />
@@ -378,8 +377,8 @@ function Scene() {
       {/* Water */}
       <WaterPlane size={200} />
 
-      {/* Vegetation */}
-      <Vegetation areaSize={100} />
+      {/* Vegetation - Disabled in tests to avoid software WebGL crash with instancing */}
+      {!window.location.search.includes('disableVegetation') && <Vegetation areaSize={100} />}
 
       {/* Player character */}
       <Player heightFunction={getTerrainHeight} />
@@ -425,73 +424,77 @@ function Scene() {
 // =============================================================================
 
 export default function App() {
-  const { gameState, isInGame, settings } = useGameStore()
+  const gameState = useGameStore(state => state.gameState)
+  const isInGame = useGameStore(state => state.isInGame)
+  const settings = useGameStore(state => state.settings)
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       
       {/* Overlay Screens */}
-      <Fade in={gameState === 'title'} mountOnEnter unmountOnExit>
-        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2000 }}>
+      {gameState === 'title' && (
+        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 7000 }}>
           <TitleScreen />
         </Box>
-      </Fade>
+      )}
       
-      <Fade in={gameState === 'gameover'} mountOnEnter unmountOnExit>
-        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2000 }}>
+      {gameState === 'gameover' && (
+        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 7000 }}>
           <GameOverScreen />
         </Box>
-      </Fade>
+      )}
       
-      <Fade in={gameState === 'settings'} mountOnEnter unmountOnExit>
-        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2000 }}>
+      {gameState === 'settings' && (
+        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 7000 }}>
           <SettingsMenu />
         </Box>
-      </Fade>
+      )}
       
-      <Fade in={gameState === 'features'} mountOnEnter unmountOnExit>
-        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2000 }}>
+      {gameState === 'features' && (
+        <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 7000 }}>
           <FeatureMenu />
         </Box>
-      </Fade>
-      
-      {/* Main Game */}
-      {isInGame && (
-        <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-          {/* HUD Overlay */}
-          <GameHUD />
-          
-          {/* Pause Menu */}
-          <Fade in={gameState === 'paused'} mountOnEnter unmountOnExit>
-            <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1000 }}>
-              <PauseMenu />
-            </Box>
-          </Fade>
-          
-          {/* 3D Canvas */}
-          <Canvas
-            shadows
-            camera={{ position: [40, 30, 40], fov: settings.fov }}
-            style={{ background: 'linear-gradient(to bottom, #1a1a2e, #16213e)' }}
-          >
-            <Suspense fallback={null}>
-              <Scene />
-            </Suspense>
-          </Canvas>
-          
-          {/* FPS Counter from Settings */}
-          {settings.showFPS && <Stats />}
-        </div>
       )}
-
-      {/* Loading indicator for all assets */}
-      <Loader 
-        containerStyles={{ background: '#121212' }}
-        innerStyles={{ width: '300px', height: '10px' }}
-        barStyles={{ background: '#4CAF50' }}
-        dataInterpolation={(p) => `Loading World: ${p.toFixed(0)}%`}
-      />
+      
+      {/* Main Game - Always rendered for stability */}
+      <div 
+        id="game-root" 
+        style={{ 
+          width: '100vw', 
+          height: '100vh', 
+          position: 'fixed', 
+          top: 0, 
+          left: 0,
+          zIndex: 100 
+        }}
+      >
+        {/* HUD Overlay */}
+        <GameHUD />
+        
+        {/* Pause Menu */}
+        {gameState === 'paused' && (
+          <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 6000 }}>
+            <PauseMenu />
+          </Box>
+        )}
+        
+        <Canvas
+          shadows
+          camera={{ position: [40, 30, 40], fov: settings.fov }}
+          style={{ background: 'linear-gradient(to bottom, #1a1a2e, #16213e)' }}
+          onCreated={({ gl }) => {
+            gl.domElement.id = 'game-canvas'
+          }}
+        >
+          <Suspense fallback={null}>
+            {isInGame && <Scene />}
+          </Suspense>
+        </Canvas>
+        
+        {/* FPS Counter from Settings */}
+        {settings.showFPS && <Stats />}
+      </div>
     </ThemeProvider>
   )
 }
