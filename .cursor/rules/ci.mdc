@@ -39,7 +39,7 @@ gh run view <run-id> --log
 ```bash
 # Python
 python -m pip install .
-python -m pygbag --build .
+python -m pygbag .
 ```
 
 ### Lint Failures

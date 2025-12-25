@@ -44,7 +44,7 @@ jobs:
 
     - name: Build with pygbag
       run: |
-        python -m pygbag --build .
+        python -m pygbag .
         # pygbag outputs to build/web
 
     - name: Setup Pages
